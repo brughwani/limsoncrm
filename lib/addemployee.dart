@@ -65,7 +65,7 @@ class _AddEmployeeState extends State<AddEmployee> {
   Future<void> loadlocations () async
   {
     try {
-      var getlocations = await dealerfetcher.fetchLocation();
+      var getlocations = await dealerfetcher.fetchLocation(widget.token);
       setState(() {
         locations=getlocations;
       });

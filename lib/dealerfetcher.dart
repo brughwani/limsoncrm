@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 
 class dealerfetcher
 {
-static  Future<List<String>> fetchLocation() async {
+static  Future<List<String>> fetchLocation(String token) async {
     final response = await http.get(
       Uri.parse('https://limsonvercelapi2.vercel.app/api/fsdealerservice?getLocations=true'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json',
+      'Authorization':'Bearer $token'},
     );
     if (response.statusCode == 200) {
       final List<dynamic> locationList = json.decode(response.body);
