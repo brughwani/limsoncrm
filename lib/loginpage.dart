@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 //import 'package:';
 import 'package:http/http.dart' as http;
+
 import 'authservice.dart';
 import 'package:lmrepaircrmadmin/Admindashboard.dart';
 class MyHomePage extends StatefulWidget {
@@ -21,41 +22,41 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     selectedValue = 'Admin';
   }
-
-Future<void> validate(String phone,String password) async {
-  // final apiKey = dotenv.env['AIRTABLE_API_KEY'];
-  // final baseId = dotenv.env['AIRTABLE_BASE_ID'];
-  // final tableName = dotenv.env['AIRTABLE_TABLE_NAME']; // Replace with your Airtable table name
-
- // final url = 'https://api.airtable.com/v0/$baseId/$tableName?filterByFormula={empcode}="$employeeCode"'; // Use a filter formula to check the employee code
-final url='https://limsonvercelapi2.vercel.app/api/fsauth';
-  final response = await http.post(
-    Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: json.encode({
-      'phone': phone,
-      'password': password,
-      'app': selectedValue?.toLowerCase(),
-    }),
-  );
-  print(response.statusCode);
-
-
-  if (response.statusCode == 200) {
-    print('User logged in successfully.');
-    var token=jsonDecode(response.body)['token'];
-  //  Navigator.push(context, MaterialPageRoute(builder: (context) => Admindashboard()));
-  Navigator.push(context, MaterialPageRoute(builder: (context) => CRMDashboard(token: token)));
-    }
-   else {
-     print(response.body);
-  print('Failed to fetch data: ${response.statusCode}');
-
-  }
-     // Error during Airtable fetch
-  }
+//
+// Future<void> validate(String phone,String password) async {
+//   // final apiKey = dotenv.env['AIRTABLE_API_KEY'];
+//   // final baseId = dotenv.env['AIRTABLE_BASE_ID'];
+//   // final tableName = dotenv.env['AIRTABLE_TABLE_NAME']; // Replace with your Airtable table name
+//
+//  // final url = 'https://api.airtable.com/v0/$baseId/$tableName?filterByFormula={empcode}="$employeeCode"'; // Use a filter formula to check the employee code
+// final url='https://limsonvercelapi2.vercel.app/api/fsauth';
+//   final response = await http.post(
+//     Uri.parse(url),
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: json.encode({
+//       'phone': phone,
+//       'password': password,
+//       'app': selectedValue?.toLowerCase(),
+//     }),
+//   );
+//   print(response.statusCode);
+//
+//
+//   if (response.statusCode == 200) {
+//     print('User logged in successfully.');
+//     var token=jsonDecode(response.body)['token'];
+//   //  Navigator.push(context, MaterialPageRoute(builder: (context) => Admindashboard()));
+//   Navigator.push(context, MaterialPageRoute(builder: (context) => CRMDashboard(token: token)));
+//     }
+//    else {
+//      print(response.body);
+//   print('Failed to fetch data: ${response.statusCode}');
+//
+//   }
+//      // Error during Airtable fetch
+//   }
 
 
 // Future<bool> signInWithEmployeeCode(String phone, String password) async {
