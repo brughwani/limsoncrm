@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+
 // Make RowState a ChangeNotifier
 // class RowState extends ChangeNotifier {
 //   final String id;
@@ -301,6 +302,10 @@ class RowState extends ChangeNotifier {
   final String dealer;
   final String serviceType;
   final String source;
+  final String name;
+  final String warrantyDate;
+  final String purchaseDate;
+
 
   // Private fields
   String _brand;
@@ -339,12 +344,12 @@ class RowState extends ChangeNotifier {
     required this.id,
     required this.token,
     required this.updateNewValuesCallback,
-    required String name,
+    required this.name,
     required String brand,
     required String category,
     required String product,
-    required String warrantyDate,
-    required String purchaseDate,
+    required this.warrantyDate,
+    required this.purchaseDate,
     required String employee,
     required String status,
     required this.complaintDate,
@@ -370,6 +375,30 @@ class RowState extends ChangeNotifier {
       Function(String, Map<String, dynamic>) updateNewValuesCallback) {
     final fields = json['fields'] as Map<String, dynamic>;
 
+    // --- ADD THIS PRINT STATEMENT ---
+    print('DEBUG: Raw complaint date from API: ${fields['date of complain']}');
+
+    String complaintDateString = '';
+    final rawDate = fields['date of complain'];
+
+    if (rawDate is String) {
+      // Case 1: The date is already a string (e.g., ISO 8601)
+      complaintDateString = rawDate;
+    } else if (rawDate is Map<String, dynamic>) {
+      // Case 2: The date is a Firebase Timestamp object
+      final seconds = rawDate['_seconds'] as int;
+      final nanoseconds = rawDate['_nanoseconds'] as int;
+
+      // Create a DateTime object from the timestamp
+      final timestamp = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+      // Format it into a string that the date picker and filter can understand
+      complaintDateString = DateFormat('yyyy-MM-dd').format(timestamp);
+    } else {
+      // Case 3: Handle any other unexpected format gracefully
+      complaintDateString = '';
+    }
+
+
     return RowState(
       id: json['id'].toString(),
       token: token,
@@ -382,7 +411,7 @@ class RowState extends ChangeNotifier {
       purchaseDate: fields['Purchase date'] as String? ?? '',
       employee: fields['allotted to'] as String? ?? 'Not assigned',
       status: fields['Status'] as String? ?? 'Open',
-     complaintDate: fields['date of complain'] as String? ?? '',
+     complaintDate: complaintDateString,
       phoneNumber: fields['Phone Number'] as String? ?? '',
       village: fields['Village'] as String? ?? '',
       dealer: fields['Dealer name'] as String? ?? '',
@@ -390,6 +419,8 @@ class RowState extends ChangeNotifier {
       source: fields['Source by'] as String? ?? '',
     );
   }
+
+
 
   void _initializeDropdowns() async {
     if (_brand.isNotEmpty && _brand != 'Select a brand') {
