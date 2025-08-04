@@ -433,6 +433,7 @@ Future<void> fetchInitialData(String token) async {
  // print("[DEBUG NOTIFIER] Setting _isLoading to TRUE. Notifying listeners for loading start."); // <-- ADD THIS
   notifyListeners(); // Notify listeners that loading has started
 
+
   try {
  //   print("[DEBUG NOTIFIER] Fetching employees and brands..."); // <-- ADD THIS
     await Future.wait([
@@ -521,11 +522,11 @@ Future<void> fetchInitialData(String token) async {
     if (dateValue == null) return '';
     try {
       if (dateValue is Timestamp) {
-        return DateFormat('yyyy-MM-dd').format(dateValue.toDate());
+        return DateFormat('dd-MM-yyyy').format(dateValue.toDate());
       } else if (dateValue is String) {
-        return DateFormat('yyyy-MM-dd').format(DateTime.parse(dateValue.split('T')[0]));
+        return DateFormat('dd-MM-yyyy').format(DateTime.parse(dateValue.split('T')[0]));
       } else if (dateValue is Map && dateValue.containsKey('_seconds')) {
-        return DateFormat('yyyy-MM-dd').format(
+        return DateFormat('dd-MM-yyyy').format(
             DateTime.fromMillisecondsSinceEpoch(dateValue['_seconds'] * 1000)
         );
       }
@@ -648,9 +649,27 @@ Future<void> fetchInitialData(String token) async {
   //
   //   notifyListeners();
   // }
+
+    final fromDateParsed = (fromdate != null && fromdate.isNotEmpty) ? DateTime.tryParse(fromdate) : null;
+    final toDateParsed = (todate != null && todate.isNotEmpty) ? DateTime.tryParse(todate) : null;
+
     _orderedRows = _allComplaints.where((complaint) {
       // 1. Date Range Filters - Early exit if fails
-      if (!_passesDateFilter(complaint.complaintDate, fromdate, todate)) {
+      // if (!_passesDateFilter(complaint.complaintDate, fromdate, todate)) {
+      //   return false;
+      // }
+
+      final complaintDateParsed = (complaint.complaintDate.isNotEmpty)
+          ? DateFormat('dd-MM-yyyy').parse(complaint.complaintDate)
+          : null;
+
+      // If the complaint date is invalid, it fails the date filter.
+      if (complaintDateParsed == null) {
+        return false;
+      }
+
+      // Now we call the new, clean helper function with the DateTime objects.
+      if (!_passesDateFilter(complaintDateParsed, fromDateParsed, toDateParsed)) {
         return false;
       }
 
@@ -678,17 +697,56 @@ Future<void> fetchInitialData(String token) async {
     notifyListeners();
   }
 // Helper methods for each filter type
-  bool _passesDateFilter(String complaintDate, String? from, String? to) {
-    if (from == null && to == null) return true;
+  bool _passesDateFilter(DateTime complaintDate, DateTime? fromDate, DateTime? toDate) {
+//     if (from == null && to == null) return true;
+//
+//     // final date = DateTime.tryParse(complaintDate);
+//     // if (date == null) return false;
+//     DateTime? date;
+//     try {
+//        date = DateFormat('dd-MM-yyyy').parseStrict(complaintDate);
+//     } catch (e) {
+//       // If parsing fails, the complaint does not pass the date filter.
+//       return false;
+//     }
+//     if (date == null) return false;
+//     final fromDate = from != null ? DateTime.tryParse(from) : null;
+//     final toDate = to != null ? DateTime.tryParse(to) : null;
+//
+// // Check if the complaint date is before the "from" date.
+//     if (fromDate != null && date.isBefore(fromDate)) return false;
+//
+//     // Check if the complaint date is after the "to" date.
+//     // We add a day to the 'to' date to make the filter inclusive of the entire day.
+//     if (toDate != null) {
+//       final adjustedToDate = toDate.add(const Duration(days: 1));
+//       if (date.isAfter(adjustedToDate)) {
+//         return false;
+//       }
+//     }
+//
+//     return true;
 
-    final date = DateTime.tryParse(complaintDate);
-    if (date == null) return false;
+    // if (fromDate != null && date.isBefore(fromDate)) return false;
+    // if (toDate != null && date.isAfter(toDate)) return false;
+    //
+    // return true;
+    if (fromDate == null && toDate == null) {
+      return true;
+    }
 
-    final fromDate = from != null ? DateTime.tryParse(from) : null;
-    final toDate = to != null ? DateTime.tryParse(to) : null;
+    // The complaint date is already a valid DateTime object.
+    if (fromDate != null && complaintDate.isBefore(fromDate)) {
+      return false;
+    }
 
-    if (fromDate != null && date.isBefore(fromDate)) return false;
-    if (toDate != null && date.isAfter(toDate)) return false;
+    // Add one day to the 'to' date to make the filter inclusive of the entire day.
+    if (toDate != null) {
+      final adjustedToDate = toDate.add(const Duration(days: 1));
+      if (complaintDate.isAfter(adjustedToDate)) {
+        return false;
+      }
+    }
 
     return true;
   }
