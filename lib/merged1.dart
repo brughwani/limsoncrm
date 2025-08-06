@@ -85,6 +85,13 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
   TabController? _tabController;
 
+  String? _selectedSortKey;
+  bool _isSortAscending = true; // Default to ascending
+
+// Add a list of sortable keys
+  final List<String> _sortableKeys = ['Date of Complaint', 'Visit Date', 'Solve Date'];
+
+
 
 
   @override
@@ -664,7 +671,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     // Complaints Tab
 
               SingleChildScrollView(
-
+                
                 padding: const EdgeInsets.all(16),
 
                 child: Column(
@@ -934,6 +941,20 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
                     ),
 
                     const SizedBox(height: 16),
+                    _buildDropdown(
+                      value: _selectedSortKey,
+                      items: _sortableKeys,
+                      hint: 'Sort by date',
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedSortKey = value;
+                          if (value != null) {
+                            // Call the new sort method in the notifier
+                            notifier.sortComplaints(_selectedSortKey!, _isSortAscending);
+                          }
+                        });
+                      },
+                    ),
 
                     Row(
 
@@ -1019,6 +1040,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                             DataColumn(label: Text('Purchase Date')),
                             DataColumn(label: Text('Date of Complaint')),
+                            DataColumn(label: Text('Visit Date')),
+                            DataColumn(label: Text('Solve Date')),
 
                             DataColumn(label: Text('Dealer')),
 
@@ -1412,6 +1435,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
           )),
 
+
       DataCell(
        ChangeNotifierProvider.value(value: state,
         child: Consumer<RowState>(
@@ -1434,7 +1458,41 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
         ),
       )),
+      // DataCell for Visit Date (now using a controller)
+      DataCell(
+        InkWell(
+          onTap: () => _selectDate(context, state.visitDateController), // Now can be edited
+          child: AbsorbPointer(
+            child: TextField(
+              controller: state.visitDateController,
+              readOnly: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
+          ),
+        ),
+      ),
 
+      // DataCell for Solve Date (now using a controller)
+      DataCell(
+        InkWell(
+          onTap: () => _selectDate(context, state.solveDateController), // Now can be edited
+          child: AbsorbPointer(
+            child: TextField(
+              controller: state.solveDateController,
+              readOnly: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
+          ),
+        ),
+      ),
 
 
       DataCell(

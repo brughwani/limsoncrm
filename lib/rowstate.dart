@@ -294,6 +294,9 @@ class RowState extends ChangeNotifier {
   final TextEditingController nameController;
   final TextEditingController warrantyDateController;
   final TextEditingController purchaseDateController;
+  final TextEditingController visitDateController;
+  final TextEditingController solveDateController;
+
 
   // Fields for client-side filtering
   final String complaintDate;
@@ -305,6 +308,8 @@ class RowState extends ChangeNotifier {
   final String name;
   final String warrantyDate;
   final String purchaseDate;
+  String? visitdate;
+  String? solvedate;
 
 
   // Private fields
@@ -354,6 +359,8 @@ class RowState extends ChangeNotifier {
     required String status,
     required this.complaintDate,
     required this.phoneNumber,
+    required this.visitdate,
+    required this.solvedate,
     required this.village,
     required this.dealer,
     required this.serviceType,
@@ -361,6 +368,8 @@ class RowState extends ChangeNotifier {
   }) : nameController = TextEditingController(text: name),
         warrantyDateController = TextEditingController(text: warrantyDate),
         purchaseDateController = TextEditingController(text: purchaseDate),
+        visitDateController = TextEditingController(text: visitdate),
+        solveDateController = TextEditingController(text: solvedate),
         _brand = brand,
         _category = category,
         _product = product,
@@ -377,9 +386,50 @@ class RowState extends ChangeNotifier {
 
     // --- ADD THIS PRINT STATEMENT ---
     print('DEBUG: Raw complaint date from API: ${fields['date of complain']}');
+    print('DEBUG: Raw visit date from API: ${fields['Visit date']}');
+    print('DEBUG: Raw solve date from API: ${fields['Solve date']}');
 
     String complaintDateString = '';
+    String visitDate = '';
+    String solveDate='';
     final rawDate = fields['date of complain'];
+
+    final rawDate1=fields['Visit date'];
+    final rawDate2=fields['Solve date'];
+
+    if (rawDate1 is String) {
+      // Case 1: The date is already a string (e.g., ISO 8601)
+      visitDate = rawDate1;
+    } else if (rawDate1 is Map<String, dynamic>) {
+      // Case 2: The date is a Firebase Timestamp object
+      final seconds = rawDate1['_seconds'] as int;
+      final nanoseconds = rawDate1['_nanoseconds'] as int;
+
+      // Create a DateTime object from the timestamp
+      final timestamp = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+      // Format it into a string that the date picker and filter can understand
+      visitDate = DateFormat('dd-MM-yyyy').format(timestamp);
+    } else {
+      // Case 3: Handle any other unexpected format gracefully
+      visitDate = '';
+    }
+
+    if (rawDate2 is String) {
+      // Case 1: The date is already a string (e.g., ISO 8601)
+      solveDate = rawDate2;
+    } else if (rawDate2 is Map<String, dynamic>) {
+      // Case 2: The date is a Firebase Timestamp object
+      final seconds = rawDate2['_seconds'] as int;
+      final nanoseconds = rawDate2['_nanoseconds'] as int;
+
+      // Create a DateTime object from the timestamp
+      final timestamp = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+      // Format it into a string that the date picker and filter can understand
+      solveDate = DateFormat('dd-MM-yyyy').format(timestamp);
+    } else {
+      // Case 3: Handle any other unexpected format gracefully
+      solveDate = '';
+    }
 
     if (rawDate is String) {
       // Case 1: The date is already a string (e.g., ISO 8601)
@@ -392,7 +442,7 @@ class RowState extends ChangeNotifier {
       // Create a DateTime object from the timestamp
       final timestamp = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
       // Format it into a string that the date picker and filter can understand
-      complaintDateString = DateFormat('yyyy-MM-dd').format(timestamp);
+      complaintDateString = DateFormat('dd-MM-yyyy').format(timestamp);
     } else {
       // Case 3: Handle any other unexpected format gracefully
       complaintDateString = '';
@@ -411,7 +461,10 @@ class RowState extends ChangeNotifier {
       purchaseDate: fields['Purchase date'] as String? ?? '',
       employee: fields['allotted to'] as String? ?? 'Not assigned',
       status: fields['Status'] as String? ?? 'Open',
+
      complaintDate: complaintDateString,
+      visitdate: visitDate,
+      solvedate: solveDate,
       phoneNumber: fields['Phone Number'] as String? ?? '',
       village: fields['Village'] as String? ?? '',
       dealer: fields['Dealer name'] as String? ?? '',
@@ -471,7 +524,7 @@ class RowState extends ChangeNotifier {
   void updateEmployee(String newEmployee) {
     if (_employee == newEmployee) return;
     _employee = newEmployee;
-    updateNewValuesCallback(id, {'allotment': _employee});
+    updateNewValuesCallback(id, {'allotted to': _employee});
     notifyListeners();
   }
 
@@ -673,6 +726,8 @@ class RowState extends ChangeNotifier {
     nameController.dispose();
     warrantyDateController.dispose();
     purchaseDateController.dispose();
+    visitDateController.dispose(); // NEW
+    solveDateController.dispose(); // NEW
     super.dispose();
   }
 }

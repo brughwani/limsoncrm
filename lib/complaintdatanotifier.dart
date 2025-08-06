@@ -764,6 +764,54 @@ Future<void> fetchInitialData(String token) async {
   //   if (filter == null || filter.isEmpty || filter == placeholder) return true;
   //   return value.toLowerCase() == filter.toLowerCase();
   // }
+  void sortComplaints(String key, bool ascending) {
+    _orderedRows.sort((a, b) {
+      DateTime? dateA;
+      DateTime? dateB;
+
+      // A helper function to parse the date from a RowState object based on the key
+      DateTime? _getDateFromRowState(RowState rowState, String sortKey) {
+        String dateString;
+        switch (sortKey) {
+          case 'Date of Complaint':
+            dateString = rowState.complaintDate;
+            break;
+          case 'Visit Date':
+            dateString = rowState.visitdate ?? '';
+            break;
+          case 'Solve Date':
+            dateString = rowState.solvedate ?? '';
+            break;
+          default:
+            return null;
+        }
+        try {
+          if (dateString.isNotEmpty) {
+            return DateFormat('dd-MM-yyyy').parse(dateString);
+          }
+        } catch (e) {
+          // Log the error but continue gracefully
+          print('Error parsing date string "$dateString" for sorting: $e');
+        }
+        return null;
+      }
+
+      dateA = _getDateFromRowState(a, key);
+      dateB = _getDateFromRowState(b, key);
+
+      // Handle null dates. Treat null as "later" for ascending, and "earlier" for descending.
+      if (dateA == null && dateB == null) return 0; // Both are null, so they're equal
+      if (dateA == null) return ascending ? 1 : -1; // Null is considered "later"
+      if (dateB == null) return ascending ? -1 : 1; // Null is considered "later"
+
+      // Compare the two valid dates
+      int comparison = dateA.compareTo(dateB);
+      return ascending ? comparison : -comparison;
+    });
+
+    notifyListeners();
+  }
+
 
   bool _passesEmployeeFilter(String employee, String? filter) {
     if (filter == null || filter.isEmpty || filter == 'Select an employee') {
