@@ -934,7 +934,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                       items: ['Open', 'In Progress', 'Resolved'],
 
-                      hint: 'Select status',
+                      hint: '`t status',
 
                       onChanged: (value) => setState(() => selectedStatus = value),
 
