@@ -70,6 +70,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
   List<String> categoriesForUI = ['Select a category'];
 
   List<String> brandsForUI = ['Select a brand'];
+  
+  final TextEditingController phone=TextEditingController();
 
 
 
@@ -1025,6 +1027,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
                           columns: const [
 
                             DataColumn(label: Text('Customer')),
+                            DataColumn(label: Text('Address')),
+                            DataColumn(label: Text('Phone')),
 
                             DataColumn(label: Text('Allotted To')),
 
@@ -1177,6 +1181,31 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
         ),
 
+      ),
+      DataCell(
+          CellWidget<String>(
+            isTextField: true,
+
+            value: state.address,
+
+            controller: state.addressController,
+
+            onChanged: state.updateaddress,
+
+          )
+      ),
+
+      DataCell(
+       CellWidget<String>(
+         isTextField: true,
+
+         value: state.phoneNumber,
+
+         controller: state.phoneController,
+
+         onChanged: state.updatephone,
+
+       )
       ),
 
       DataCell(

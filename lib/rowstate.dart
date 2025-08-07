@@ -292,10 +292,12 @@ class RowState extends ChangeNotifier {
   final Function(String, Map<String, dynamic>) updateNewValuesCallback;
 
   final TextEditingController nameController;
+  final TextEditingController addressController;
   final TextEditingController warrantyDateController;
   final TextEditingController purchaseDateController;
   final TextEditingController visitDateController;
   final TextEditingController solveDateController;
+  final TextEditingController phoneController;
 
 
   // Fields for client-side filtering
@@ -310,6 +312,7 @@ class RowState extends ChangeNotifier {
   final String purchaseDate;
   String? visitdate;
   String? solvedate;
+  final String address;
 
 
   // Private fields
@@ -350,6 +353,7 @@ class RowState extends ChangeNotifier {
     required this.token,
     required this.updateNewValuesCallback,
     required this.name,
+    required this.address,
     required String brand,
     required String category,
     required String product,
@@ -366,6 +370,8 @@ class RowState extends ChangeNotifier {
     required this.serviceType,
     required this.source,
   }) : nameController = TextEditingController(text: name),
+  addressController=TextEditingController(text: address),
+  phoneController=TextEditingController(text: phoneNumber),
         warrantyDateController = TextEditingController(text: warrantyDate),
         purchaseDateController = TextEditingController(text: purchaseDate),
         visitDateController = TextEditingController(text: visitdate),
@@ -454,6 +460,7 @@ class RowState extends ChangeNotifier {
       token: token,
       updateNewValuesCallback: updateNewValuesCallback,
       name: fields['Customer name'] as String? ?? '',
+      address: fields['address'],
       brand: fields['Brand'] as String? ?? '',
       category: fields['Category'] as String? ?? '',
       product: fields['Product name'] as String? ?? '',
@@ -461,7 +468,6 @@ class RowState extends ChangeNotifier {
       purchaseDate: fields['Purchase date'] as String? ?? '',
       employee: fields['allotted to'] as String? ?? 'Not assigned',
       status: fields['Status'] as String? ?? 'Open',
-
      complaintDate: complaintDateString,
       visitdate: visitDate,
       solvedate: solveDate,
@@ -540,7 +546,12 @@ class RowState extends ChangeNotifier {
   void updateName(String newName) {
     updateNewValuesCallback(id, {'Customer name': newName});
   }
-
+  void updatephone(String newphone) {
+    updateNewValuesCallback(id, {'Phone Number': newphone});
+  }
+  void updateaddress(String newaddress) {
+    updateNewValuesCallback(id, {'address': newaddress});
+  }
   void updateWarrantyDate(String newDate) {
     warrantyDateController.text = newDate;
     updateNewValuesCallback(id, {'warranty expiry date': newDate});
@@ -687,8 +698,12 @@ class RowState extends ChangeNotifier {
     if (updates.containsKey('Customer name')) {
       nameController.text = updates['Customer name'];
     }
-    if (updates.containsKey('allotment')) {
-      _employee = updates['allotment'];
+    if(updates.containsKey('Phone Number'))
+      {
+        phoneController.text=updates['Phone Number'];
+      }
+    if (updates.containsKey('allotted to')) {
+      _employee = updates['allotted to'];
     }
     if (updates.containsKey('Status')) {
       _status = updates['Status'];
@@ -725,6 +740,7 @@ class RowState extends ChangeNotifier {
   void dispose() {
     nameController.dispose();
     warrantyDateController.dispose();
+    phoneController.dispose();
     purchaseDateController.dispose();
     visitDateController.dispose(); // NEW
     solveDateController.dispose(); // NEW
