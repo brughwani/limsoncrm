@@ -310,9 +310,12 @@ class RowState extends ChangeNotifier {
   final String name;
   final String warrantyDate;
   final String purchaseDate;
+<<<<<<< HEAD
   String? visitdate;
   String? solvedate;
   final String address;
+=======
+>>>>>>> origin/main
 
 
   // Private fields
@@ -353,7 +356,10 @@ class RowState extends ChangeNotifier {
     required this.token,
     required this.updateNewValuesCallback,
     required this.name,
+<<<<<<< HEAD
     required this.address,
+=======
+>>>>>>> origin/main
     required String brand,
     required String category,
     required String product,
@@ -392,6 +398,7 @@ class RowState extends ChangeNotifier {
 
     // --- ADD THIS PRINT STATEMENT ---
     print('DEBUG: Raw complaint date from API: ${fields['date of complain']}');
+<<<<<<< HEAD
     print('DEBUG: Raw visit date from API: ${fields['Visit date']}');
     print('DEBUG: Raw solve date from API: ${fields['Solve date']}');
 
@@ -437,6 +444,12 @@ class RowState extends ChangeNotifier {
       solveDate = '';
     }
 
+=======
+
+    String complaintDateString = '';
+    final rawDate = fields['date of complain'];
+
+>>>>>>> origin/main
     if (rawDate is String) {
       // Case 1: The date is already a string (e.g., ISO 8601)
       complaintDateString = rawDate;
@@ -448,7 +461,11 @@ class RowState extends ChangeNotifier {
       // Create a DateTime object from the timestamp
       final timestamp = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
       // Format it into a string that the date picker and filter can understand
+<<<<<<< HEAD
       complaintDateString = DateFormat('dd-MM-yyyy').format(timestamp);
+=======
+      complaintDateString = DateFormat('yyyy-MM-dd').format(timestamp);
+>>>>>>> origin/main
     } else {
       // Case 3: Handle any other unexpected format gracefully
       complaintDateString = '';
@@ -469,8 +486,11 @@ class RowState extends ChangeNotifier {
       employee: fields['allotted to'] as String? ?? 'Not assigned',
       status: fields['Status'] as String? ?? 'Open',
      complaintDate: complaintDateString,
+<<<<<<< HEAD
       visitdate: visitDate,
       solvedate: solveDate,
+=======
+>>>>>>> origin/main
       phoneNumber: fields['Phone Number'] as String? ?? '',
       village: fields['Village'] as String? ?? '',
       dealer: fields['Dealer name'] as String? ?? '',

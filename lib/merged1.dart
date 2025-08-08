@@ -70,8 +70,11 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
   List<String> categoriesForUI = ['Select a category'];
 
   List<String> brandsForUI = ['Select a brand'];
+<<<<<<< HEAD
   
   final TextEditingController phone=TextEditingController();
+=======
+>>>>>>> origin/main
 
 
 
@@ -87,6 +90,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
   TabController? _tabController;
 
+<<<<<<< HEAD
   String? _selectedSortKey;
   bool _isSortAscending = true; // Default to ascending
 
@@ -94,6 +98,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
   final List<String> _sortableKeys = ['Date of Complaint', 'Visit Date', 'Solve Date'];
 
 
+=======
+>>>>>>> origin/main
 
 
   @override
@@ -673,7 +679,11 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     // Complaints Tab
 
               SingleChildScrollView(
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> origin/main
                 padding: const EdgeInsets.all(16),
 
                 child: Column(
@@ -936,13 +946,18 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                       items: ['Open', 'In Progress', 'Resolved'],
 
+<<<<<<< HEAD
                       hint: '`t status',
+=======
+                      hint: 'Select status',
+>>>>>>> origin/main
 
                       onChanged: (value) => setState(() => selectedStatus = value),
 
                     ),
 
                     const SizedBox(height: 16),
+<<<<<<< HEAD
                     _buildDropdown(
                       value: _selectedSortKey,
                       items: _sortableKeys,
@@ -957,6 +972,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
                         });
                       },
                     ),
+=======
+>>>>>>> origin/main
 
                     Row(
 
@@ -1027,8 +1044,11 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
                           columns: const [
 
                             DataColumn(label: Text('Customer')),
+<<<<<<< HEAD
                             DataColumn(label: Text('Address')),
                             DataColumn(label: Text('Phone')),
+=======
+>>>>>>> origin/main
 
                             DataColumn(label: Text('Allotted To')),
 
@@ -1044,8 +1064,11 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                             DataColumn(label: Text('Purchase Date')),
                             DataColumn(label: Text('Date of Complaint')),
+<<<<<<< HEAD
                             DataColumn(label: Text('Visit Date')),
                             DataColumn(label: Text('Solve Date')),
+=======
+>>>>>>> origin/main
 
                             DataColumn(label: Text('Dealer')),
 
@@ -1182,6 +1205,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
         ),
 
       ),
+<<<<<<< HEAD
       DataCell(
           CellWidget<String>(
             isTextField: true,
@@ -1207,6 +1231,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
        )
       ),
+=======
+>>>>>>> origin/main
 
       DataCell(
 
@@ -1464,7 +1490,10 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
           )),
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
       DataCell(
        ChangeNotifierProvider.value(value: state,
         child: Consumer<RowState>(
@@ -1487,6 +1516,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
         ),
       )),
+<<<<<<< HEAD
       // DataCell for Visit Date (now using a controller)
       DataCell(
         InkWell(
@@ -1522,6 +1552,9 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
           ),
         ),
       ),
+=======
+
+>>>>>>> origin/main
 
 
       DataCell(
