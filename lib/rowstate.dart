@@ -202,7 +202,7 @@ class RowState extends ChangeNotifier {
       visitdate: visitDate,
       solvedate: solveDate,
 
-      phoneNumber: fields['Phone Number'] as String? ?? '',
+      phoneNumber: fields['Phone'] as String? ?? '',
       village: fields['Village'] as String? ?? '',
       dealer: fields['Dealer name'] as String? ?? '',
       serviceType: fields['Service type'] as String? ?? '',
@@ -278,7 +278,7 @@ class RowState extends ChangeNotifier {
     updateNewValuesCallback(id, {'Customer name': newName});
   }
   void updatephone(String newphone) {
-    updateNewValuesCallback(id, {'Phone Number': newphone});
+    updateNewValuesCallback(id, {'Phone': newphone});
   }
   void updateaddress(String newaddress) {
     updateNewValuesCallback(id, {'address': newaddress});
@@ -429,7 +429,7 @@ class RowState extends ChangeNotifier {
     if (updates.containsKey('Customer name')) {
       nameController.text = updates['Customer name'];
     }
-    if(updates.containsKey('Phone Number'))
+    if(updates.containsKey('Phone'))
       {
         phoneController.text=updates['Phone Number'];
       }
