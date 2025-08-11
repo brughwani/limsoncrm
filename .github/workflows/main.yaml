@@ -1,58 +1,100 @@
-name: Build and Deploy Web App
+#name: Build and Deploy Web App
+#on:
+#  push:
+#    branches:
+#      - main
+#jobs:
+#  hosting:
+#    name: Deploy Website
+#    runs-on: ubuntu-latest
+#    steps:
+#      # Checkout Repository
+#      - uses: actions/checkout@v3
+#
+#      # Install Flutter command
+#      - name: Install flutter
+#      - uses: subosito/flutter-action@v2
+#        with:
+#          channel: "stable"
+#      - run: flutter --version
+#
+#      # Build Website
+#      - name: Build Website
+#      - run: |
+#          flutter clean
+#          flutter pub get
+#          flutter build web --release
+#        working-directory: ./
+#
+#      - name: Install FlutterFire CLI
+#        run: |
+#                dart pub global activate flutterfire_cli
+#
+#      - name: Configure Firebase Options
+#        run: |
+#              flutterfire configure \
+#                --project=limsoncrm \
+#                --web \
+#                --out=lib/firebase_options.dart
+#        env:
+#              FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+#
+##      - name: Install dependencies
+##        run: flutter pub get
+#
+##      - name: Build web app
+##        run: |
+##                flutter clean
+##                flutter pub get
+##                flutter build web --release
+##        working-directory: ./
+#      # Deploy Firebase Hosting
+#      - name: Deploy Firebase Hosting
+#        uses: w9jds/firebase-action@master
+#        with:
+#          args: deploy --only hosting:limsoncrm
+#        env:
+#          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+#          PROJECT_PATH: ./build/web
+
+name: Deploy to Firebase on Commit
+
 on:
   push:
     branches:
-      - main
+      - main  # Change to your production branch (e.g. master, production)
+    paths:
+      - '**'  # Watch all files
+      # Optional: Only deploy when specific paths change
+      # - 'lib/**'
+      # - 'web/**'
+
 jobs:
-  hosting:
-    name: Deploy Website
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      # Checkout Repository
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Install Flutter command
-      - name: Install flutter
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-      - run: flutter --version
+          channel: 'stable'
+          cache: true
 
-      # Build Website
-      - name: Build Website
-      - run: |
-          flutter clean
-          flutter pub get
-          flutter build web --release
-        working-directory: ./
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Install FlutterFire CLI
-        run: |
-                dart pub global activate flutterfire_cli
+      - name: Build web release
+        run: flutter build web --release --web-renderer html
 
-      - name: Configure Firebase Options
-        run: |
-              flutterfire configure \
-                --project=limsoncrm \
-                --web \
-                --out=lib/firebase_options.dart
-        env:
-              FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
-#      - name: Install dependencies
-#        run: flutter pub get
-
-#      - name: Build web app
-#        run: |
-#                flutter clean
-#                flutter pub get
-#                flutter build web --release
-#        working-directory: ./
-      # Deploy Firebase Hosting
-      - name: Deploy Firebase Hosting
-        uses: w9jds/firebase-action@master
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          args: deploy --only hosting:limsoncrm
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_PATH: ./build/web
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+          projectId: limsoncrm
+          target: 'build/web'
+          # Remove channelId for production deployment
+          # channelId: 'pr-${{ github.event.number }}'
