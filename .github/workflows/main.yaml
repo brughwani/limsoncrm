@@ -25,6 +25,26 @@ jobs:
           flutter build web
         working-directory: ./
 
+      - name: Install FlutterFire CLI
+        run: |
+                dart pub global activate flutterfire_cli
+
+      - name: Configure Firebase Options
+        run: |
+              flutterfire configure \
+                --project=limsoncrm \
+                --web \
+                --out=lib/firebase_options.dart
+        env:
+              FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web app
+        run: flutter build web --release
+
+
       # Deploy Firebase Hosting
       - name: Deploy Firebase Hosting
         uses: w9jds/firebase-action@master
