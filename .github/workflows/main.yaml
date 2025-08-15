@@ -61,7 +61,7 @@ jobs:
           }
           EOF
           
-          dart run flutterfire_cli:flutterfire configure \
+          dart pub global run flutterfire_cli:flutterfire configure \
             --project=${{ secrets.FIREBASE_PROJECT_ID }} \
             --platforms=web \
             --out=lib/firebase_options.dart \
@@ -70,7 +70,7 @@ jobs:
           
           rm firebase_config.json
         env:
-          FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Install dependencies
         run: |
