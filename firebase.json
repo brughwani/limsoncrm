@@ -40,6 +40,17 @@
   },
   "hosting": {
     "public": "build/web",
+    "headers": [
+      {
+        "source": "/*",
+        "headers": [
+          {
+            "key": "x-robots-tag",
+            "value": "noindex"
+          }
+        ]
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -47,9 +58,18 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/_next/static/**",
+        "destination": "/404.html"
+      },
+      {
+        "source": "/static/**",
+        "destination": "/404.html"
+      },
+      {
+        "source" : "/(.*)",
+        "destination" : "/index.html"
       }
     ]
   }
 }
+
