@@ -27,22 +27,16 @@ jobs:
             restore-keys: |
               flutter-sdk-${{ runner.os }}-
 
-      - name: Setup Flutter
+      - name: Setup Flutter with built-in caching
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          cache: true
-
-      - name: Cache Pub dependencies
-        uses: actions/cache@v3
-        id: pub-cache
-        with:
-            path: |
+            channel: 'stable'
+            cache: true
+            cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+            cache-path: |
               ~/.pub-cache
-              build
-            key: pub-deps-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
-            restore-keys: |
-              pub-deps-${{ runner.os }}-
+              .dart_tool
+              /opt/hostedtoolcache/flutter
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
