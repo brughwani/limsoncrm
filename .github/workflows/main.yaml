@@ -44,7 +44,7 @@ jobs:
             restore-keys: |
               pub-deps-${{ runner.os }}-
               - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+            run: npm install -g firebase-tools
 
       - name: Generate Firebase Options Securely
         run: |
