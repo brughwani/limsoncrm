@@ -45,7 +45,7 @@ jobs:
 
       - name: Generate Firebase Options Securely
         run: |
-          dart pub global activate flutterfire_cli
+          flutter pub global activate flutterfire_cli
           cat > firebase_config.json <<EOF
           {
             "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
@@ -58,7 +58,7 @@ jobs:
           }
           EOF
           
-          dart pub global run flutterfire_cli:flutterfire configure \
+          flutter pub global run flutterfire_cli:flutterfire configure \
             --project=${{ secrets.FIREBASE_PROJECT_ID }} \
             --platforms=web \
             --out=lib/firebase_options.dart \
