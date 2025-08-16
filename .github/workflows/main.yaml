@@ -34,9 +34,7 @@ jobs:
             cache: true
             cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
             cache-path: |
-              ~/.pub-cache
-              .dart_tool
-              /opt/hostedtoolcache/flutter
+              ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
