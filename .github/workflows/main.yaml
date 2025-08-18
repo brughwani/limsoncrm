@@ -46,8 +46,7 @@ jobs:
 
     # 3. Verify installations
       - name: Verify Dart and Flutter
-        run:
-          |
+        run: |
             echo "Flutter version: $(flutter --version)"
             echo "Dart version: $(dart --version)"
             echo "PATH: $PATH"
