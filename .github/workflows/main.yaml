@@ -32,6 +32,14 @@ jobs:
         run: |
           node -v
           npm -v
+      - name: Add Flutter and Dart to PATH
+        run: |
+         echo "FLUTTER_ROOT=${{ steps.flutter-setup.outputs.flutter-path }}" >> $GITHUB_ENV
+         echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+         echo "${{ steps.flutter-setup.outputs.flutter-path }}/bin" >> $GITHUB_PATH
+         echo "${{ steps.flutter-setup.outputs.dart-path }}/bin" >> $GITHUB_PATH
+         echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
+
 
       - name: Verify Dart and Flutter
         run: |
