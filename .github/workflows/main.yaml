@@ -57,7 +57,7 @@ jobs:
       - name: Update FlutterFire CLI
         run: |
           echo "Activating latest FlutterFire CLI"
-          flutter pub global activate flutterfire_cli
+          flutter pub global activate flutterfire_cli --no-cache
           echo "Verifying FlutterFire CLI version"
           flutter pub global run flutterfire_cli:flutterfire --version
 
