@@ -16,6 +16,7 @@ jobs:
 
       - name: Setup Flutter with built-in caching
         uses: subosito/flutter-action@v2
+        id: flutter-setup # Added this ID to reference the action's outputs
         with:
           channel: 'stable'
           cache: true
