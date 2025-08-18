@@ -55,11 +55,10 @@ jobs:
           npm install -g firebase-tools
       # Use a new step to update and verify the flutterfire_cli version
       # New step to deactivate the old version and activate the latest
-      - name: Deactivate and Activate FlutterFire CLI
+      # New step to deactivate the old version and activate the latest
+      - name: Install FlutterFire CLI
         run: |
-          echo "Deactivating any existing FlutterFire CLI version"
-          flutter pub global deactivate flutterfire_cli
-          echo "Activating latest FlutterFire CLI"
+          echo "Installing latest FlutterFire CLI"
           flutter pub global activate flutterfire_cli
           echo "Verifying FlutterFire CLI version"
           flutter pub global run flutterfire_cli:flutterfire --version
