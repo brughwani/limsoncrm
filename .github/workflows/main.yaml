@@ -1,15 +1,11 @@
 name: Deploy to Firebase on Commit
 
-
 on:
   push:
     branches:
-      - main  # Change to your production branch (e.g. master, production)
+      - main  # Change to your production branch (e.g., master, production)
     paths:
       - '**'  # Watch all files
-      # Optional: Only deploy when specific paths change
-      # - 'lib/**'
-      # - 'web/**'
 
 jobs:
   build_and_deploy:
@@ -18,61 +14,51 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Flutter SDK
-        uses: actions/cache@v3
-        id: flutter-sdk-cache
-        with:
-            path: /opt/hostedtoolcache/flutter
-            key: flutter-sdk-${{ runner.os }}-stable
-            restore-keys: |
-              flutter-sdk-${{ runner.os }}-
-
       - name: Setup Flutter with built-in caching
         uses: subosito/flutter-action@v2
         with:
-            channel: 'stable'
-            cache: true
-            cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
-            cache-path: |
-              ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
+          channel: 'stable'
+          cache: true
+          cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+          cache-path: |
+            ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Use a recent LTS version
 
-      # Add Flutter to PATH
-      - name: Configure environment paths
+      - name: Verify Node and NPM installation
         run: |
-          echo "FLUTTER_ROOT=${{ steps.flutter-install.outputs.flutter-path }}" >> $GITHUB_ENV
-          echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
-          echo "${{ steps.flutter-install.outputs.flutter-path }}" >> $GITHUB_PATH
-          echo "${{ steps.flutter-install.outputs.dart-path }}" >> $GITHUB_PATH
-          echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
+          node -v
+          npm -v
 
-    # 3. Verify installations
       - name: Verify Dart and Flutter
         run: |
-            echo "Flutter version: $(flutter --version)"
-            echo "Dart version: $(dart --version)"
-            echo "PATH: $PATH"
+          echo "Flutter version: $(flutter --version)"
+          echo "Dart version: $(dart --version)"
 
-        # 4. Install Firebase CLI
+      # Install Flutter dependencies only once
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      # Install Firebase CLI globally using npm
       - name: Install Firebase Tools
         run: |
           npm install -g firebase-tools
 
       - name: Generate Firebase Options Securely
         run: |
-           flutter pub global activate flutterfire_cli
-           cat > firebase_config.json <<EOF
-           {
-            "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
-            "appId": "${{ secrets.FIREBASE_APP_ID }}",
-            "apiKey": "${{ secrets.FIREBASE_API_KEY }}",
-            "authDomain": "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            "storageBucket": "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            "measurementId": "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
-            "messagingSenderId": "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
+          flutter pub global activate flutterfire_cli
+          cat > firebase_config.json <<EOF
+          {
+           "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
+           "appId": "${{ secrets.FIREBASE_APP_ID }}",
+           "apiKey": "${{ secrets.FIREBASE_API_KEY }}",
+           "authDomain": "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+           "storageBucket": "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+           "measurementId": "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
+           "messagingSenderId": "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
           }
           EOF
           
@@ -87,17 +73,6 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
-      - name: Install dependencies
-        run: |
-          # Only run pub get if cache wasn't restored
-          if [[ ! -f .dart_tool/package_config.json ]]; then
-            flutter pub get
-          fi
-
-
-      - name: Install dependencies
-        run: flutter pub get
-
       - name: Build web release
         run: flutter build web --release
 
@@ -111,7 +86,6 @@ jobs:
           target: 'build/web'
           # Remove channelId for production deployment
           # channelId: 'pr-${{ github.event.number }}'
-
 
 #name: Build and Deploy Web App
 #on:
