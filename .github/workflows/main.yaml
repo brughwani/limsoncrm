@@ -28,13 +28,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Use a recent LTS version
-            # --- Debugging Step ---
-      - name: List Flutter installation directories
+      # --- Debugging Step to check action outputs ---
+      - name: Debug Flutter action outputs
         run: |
-                echo "Listing directories under /opt/hostedtoolcache/flutter/"
-                ls -la /opt/hostedtoolcache/flutter/
-        # ----------------------
-
+          echo "Flutter path: ${{ steps.flutter-setup.outputs.flutter-path }}"
+          echo "Dart path: ${{ steps.flutter-setup.outputs.dart-path }}"
+      # ----------------------
 
       # Explicitly add Flutter/Dart to the PATH
       - name: Add Flutter and Dart to PATH
