@@ -28,6 +28,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Use a recent LTS version
+            # --- Debugging Step ---
+      - name: List Flutter installation directories
+        run: |
+                echo "Listing directories under /opt/hostedtoolcache/flutter/"
+                ls -la /opt/hostedtoolcache/flutter/
+        # ----------------------
+
 
       # Explicitly add Flutter/Dart to the PATH
       - name: Add Flutter and Dart to PATH
