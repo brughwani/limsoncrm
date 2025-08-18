@@ -35,6 +35,11 @@ jobs:
             cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
             cache-path: |
               ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use a recent LTS version
+
       # Add Flutter to PATH
       - name: Configure environment paths
         run: |
