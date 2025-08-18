@@ -35,19 +35,33 @@ jobs:
             cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
             cache-path: |
               ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
+      # Add Flutter to PATH
+      - name: Configure environment paths
+        run: |
+          echo "FLUTTER_ROOT=${{ steps.flutter-install.outputs.flutter-path }}" >> $GITHUB_ENV
+          echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+          echo "${{ steps.flutter-install.outputs.flutter-path }}" >> $GITHUB_PATH
+          echo "${{ steps.flutter-install.outputs.dart-path }}" >> $GITHUB_PATH
+          echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
 
-      - name: Install Firebase CLI
+    # 3. Verify installations
+      - name: Verify Dart and Flutter
+        run:
+          |
+            echo "Flutter version: $(flutter --version)"
+            echo "Dart version: $(dart --version)"
+            echo "PATH: $PATH"
+
+        # 4. Install Firebase CLI
+      - name: Install Firebase Tools
         run: npm install -g firebase-tools
-
-      - name: Add Dart global packages to PATH
-        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
 
       - name: Generate Firebase Options Securely
         run: |
-          flutter pub global activate flutterfire_cli
-          cat > firebase_config.json <<EOF
-          {
+           flutter pub global activate flutterfire_cli
+           cat > firebase_config.json <<EOF
+           {
             "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
             "appId": "${{ secrets.FIREBASE_APP_ID }}",
             "apiKey": "${{ secrets.FIREBASE_API_KEY }}",
