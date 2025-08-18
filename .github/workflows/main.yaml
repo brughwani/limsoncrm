@@ -53,6 +53,14 @@ jobs:
       - name: Install Firebase Tools
         run: |
           npm install -g firebase-tools
+      # Use a new step to update and verify the flutterfire_cli version
+      - name: Update FlutterFire CLI
+        run: |
+          echo "Activating latest FlutterFire CLI"
+          flutter pub global activate flutterfire_cli
+          echo "Verifying FlutterFire CLI version"
+          flutter pub global run flutterfire_cli:flutterfire --version
+
 
       - name: Generate Firebase Options Securely
         run: |
