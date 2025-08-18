@@ -16,6 +16,7 @@ jobs:
 
       - name: Setup Flutter with built-in caching
         uses: subosito/flutter-action@v2
+        id: flutter-setup # Add an ID to reference this step's outputs
         with:
           channel: 'stable'
           cache: true
@@ -28,18 +29,19 @@ jobs:
         with:
           node-version: '20' # Use a recent LTS version
 
+      # Explicitly add Flutter/Dart to the PATH
+      - name: Add Flutter and Dart to PATH
+        run: |
+          echo "FLUTTER_ROOT=${{ steps.flutter-setup.outputs.flutter-path }}" >> $GITHUB_ENV
+          echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
+          echo "${{ steps.flutter-setup.outputs.flutter-path }}/bin" >> $GITHUB_PATH
+          echo "${{ steps.flutter-setup.outputs.dart-path }}/bin" >> $GITHUB_PATH
+          echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
+
       - name: Verify Node and NPM installation
         run: |
           node -v
           npm -v
-      - name: Add Flutter and Dart to PATH
-        run: |
-         echo "FLUTTER_ROOT=${{ steps.flutter-setup.outputs.flutter-path }}" >> $GITHUB_ENV
-         echo "PUB_CACHE=${HOME}/.pub-cache" >> $GITHUB_ENV
-         echo "${{ steps.flutter-setup.outputs.flutter-path }}/bin" >> $GITHUB_PATH
-         echo "${{ steps.flutter-setup.outputs.dart-path }}/bin" >> $GITHUB_PATH
-         echo "${HOME}/.pub-cache/bin" >> $GITHUB_PATH
-
 
       - name: Verify Dart and Flutter
         run: |
