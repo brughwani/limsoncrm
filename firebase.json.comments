@@ -1,0 +1,51 @@
+ "flutter": {
+         "platforms": {
+           "android": {
+             "default": {
+               "projectId": "limsoncrm",
+               "appId": "1:631134926632:android:8f21930ab3b9aa1f77c21d",
+               "fileOutput": "android/app/google-services.json"
+             }
+           },
+           "ios": {
+             "default": {
+               "projectId": "limsoncrm",
+               "appId": "1:631134926632:ios:8a0594389735754977c21d",
+               "uploadDebugSymbols": false,
+               "fileOutput": "ios/Runner/GoogleService-Info.plist"
+             }
+           },
+           "macos": {
+             "default": {
+               "projectId": "limsoncrm",
+               "appId": "1:631134926632:ios:8a0594389735754977c21d",
+               "uploadDebugSymbols": false,
+               "fileOutput": "macos/Runner/GoogleService-Info.plist"
+             }
+           },
+           "dart": {
+             "lib/firebase_options.dart": {
+               "projectId": "limsoncrm",
+               "configurations": {
+                 "android": "1:631134926632:android:8f21930ab3b9aa1f77c21d",
+                 "ios": "1:631134926632:ios:8a0594389735754977c21d",
+                 "macos": "1:631134926632:ios:8a0594389735754977c21d",
+                 "web": "1:631134926632:web:b81d5e9792f0c15b77c21d",
+                 "windows": "1:631134926632:web:72524ab67bc944ea77c21d"
+               }
+             }
+           }
+         }
+       },
+         {
+               "source": "/_next/static/**",
+               "destination": "/404.html"
+             },
+             {
+               "source": "/static/**",
+               "destination": "/404.html"
+             },
+             {
+               "source" : "/(.*)",
+               "destination" : "/index.html"
+             }
