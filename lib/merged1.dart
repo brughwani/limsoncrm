@@ -8,8 +8,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'addemployee.dart';
 import 'package:excel/excel.dart';
-import 'dart:html' as html;
-
+//import 'dart:html' as html;
+import 'web_imports.dart';
 
 // Assuming these files exist in your project
 import 'package:lmrepaircrmadmin/addemployee.dart'; // AddEmployee widget
@@ -459,12 +459,12 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
       if (kIsWeb) {
         // Web-specific download logic
-        final blob = html.Blob([excelBytes]);
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final anchor = html.AnchorElement(href: url)
+        final blob = Blob([excelBytes]);
+        final url = Url.createObjectUrlFromBlob(blob);
+        final anchor = AnchorElement(href: url)
           ..setAttribute('download', fileName)
           ..click();
-        html.Url.revokeObjectUrl(url);
+        Url.revokeObjectUrl(url);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Download complete!')),
