@@ -99,7 +99,7 @@ jobs:
           projectId: limsoncrm
           target: 'build/web'
           # Remove channelId for production deployment
-          # channelId: 'pr-${{ github.event.number }}'
+          channelId: 'pr-${{ github.event.number }}'
 
 #name: Build and Deploy Web App
 #on:
