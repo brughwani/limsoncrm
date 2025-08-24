@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +11,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'addemployee.dart';
 import 'package:excel/excel.dart';
+import 'package:flutter/widgets.dart' as w;
 //import 'dart:html' as html;
 import 'web_imports.dart';
 
@@ -16,6 +20,9 @@ import 'package:lmrepaircrmadmin/addemployee.dart'; // AddEmployee widget
 import 'complaintdatanotifier.dart'; // ComplaintDataNotifier class
 import 'rowstate.dart'; // RowState class
 import 'cellwidget.dart'; // CellWidget class
+import 'package:web/web.dart';
+import 'package:web/src/dom.dart' as web;
+
 
 class CRMDashboard extends StatefulWidget {
   final String token;
@@ -413,11 +420,10 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     }
 
   }
-
   Future<void> _downloadExcel(List<RowState> data) async {
     if (data.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No data to download.')),
+        const SnackBar(content: w.Text('No data to download.')),
       );
       return;
     }
@@ -427,19 +433,18 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     });
 
     try {
+      // 1. Create the Excel file in memory
       final excel = Excel.createExcel();
       final sheet = excel['Sheet1'];
 
-      // Add header row
+      // 2. Define and add the header row
       final headers = [
-        'Customer', 'Phone Number', 'Allotted To', 'Status', 'Brand', 'Category', 'Product',
-        'Warranty Date', 'Purchase Date', 'Date of Complaint', 'Dealer', 'Location'
+        'Customer', 'Phone Number', 'Allotted To', 'Status', 'Brand', 'Category',
+        'Product', 'Warranty Date', 'Purchase Date', 'Date of Complaint', 'Dealer', 'Location'
       ];
-     // sheet.insertRowIterables(headers, 0);
-      final List<CellValue> headerCells = headers.map((header) => TextCellValue(header)).toList();
-      sheet.insertRowIterables(headerCells, 0);
+      sheet.insertRowIterables(headers.map((h) => TextCellValue(h)).toList(), 0);
 
-      // Add data rows
+      // 3. Add data rows from your state
       for (var i = 0; i < data.length; i++) {
         final row = data[i];
         final rowData = [
@@ -447,40 +452,55 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
           row.category, row.product, row.warrantyDate, row.purchaseDate,
           row.complaintDate, row.dealer, row.village
         ];
-
-        final List<CellValue> dataCells = rowData.map((cellData) => TextCellValue(cellData)).toList();
+        // Convert all data to TextCellValue to prevent formatting issues
+        final dataCells = rowData.map((cell) => TextCellValue(cell ?? '')).toList();
         sheet.insertRowIterables(dataCells, i + 1);
-        //sheet.insertRowIterables(rowData.cast<CellValue?>(), i + 1);
       }
 
-      final fileName = 'crm_dashboard_data_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.xlsx';
+      // 4. Encode the file into bytes
+      final excelBytes = excel.encode();
+      if (excelBytes == null) {
+        throw Exception('Error encoding the Excel file.');
+      }
 
-      final excelBytes = excel.encode()!;
-
+      // 5. Trigger the download using the `package:web` library
       if (kIsWeb) {
-        // Web-specific download logic
-        final blob = Blob([excelBytes]);
-        final url = Url.createObjectUrlFromBlob(blob);
-        final anchor = AnchorElement(href: url)
-          ..setAttribute('download', fileName)
-          ..click();
-        Url.revokeObjectUrl(url);
+        final fileName = 'crm_data_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.xlsx';
+
+        // Create a Blob from the byte data with the correct MIME type
+        final blob = Blob(
+          [excelBytes.toJSBox].toJS,
+          BlobPropertyBag(type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+        );
+
+        // Create a URL for the Blob
+        final url =URL.createObjectURL(blob);
+
+        // Create an anchor element to trigger the download
+        final anchor = document.createElement('a') as HTMLAnchorElement
+          ..href = url
+          ..style.display = 'none'
+          ..download = fileName;
+
+        // Append to the DOM, click, and then remove
+        document.body!.append(anchor);
+        anchor.click();
+        document.body!.removeChild(anchor);
+
+        // Release the object URL
+        URL.revokeObjectURL(url);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Download complete!')),
+          const SnackBar(content: w.Text('Download complete!')),
         );
       } else {
-        // You would need to implement platform-specific download logic for mobile/desktop
-        // For example, using a package like path_provider and file_picker.
-        // For now, this code is focused on the web experience.
-        print("Excel file generated, but not saved. This feature is currently for web only.");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Download is only supported on the web platform.')),
+          const SnackBar(content: w.Text('Download is only supported on the web.')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to download: $e')),
+        SnackBar(content: w.Text('Failed to download: $e')),
       );
     } finally {
       setState(() {
@@ -488,7 +508,6 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
       });
     }
   }
-
 
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -543,7 +562,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
       appBar: AppBar(
 
-        title: const Text('CRM Dashboard'),
+        title: const w.Text('CRM Dashboard'),
 
         actions: [
 
@@ -680,7 +699,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                   children: [
 
-                    const Text('Search Filters:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const w.Text('Search Filters:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
                     const SizedBox(height: 16),
 
@@ -963,7 +982,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                       children: [
 
-                        ElevatedButton(onPressed: _clearFilters, child: Text("Clear filters")),
+                        ElevatedButton(onPressed: _clearFilters, child: w.Text("Clear filters")),
 
                         ElevatedButton(
 
@@ -999,7 +1018,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                           },
 
-                          child: const Text('Search Complaints'),
+                          child: const w.Text('Search Complaints'),
 
                         ),],
 
@@ -1015,7 +1034,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                     else if (notifier.orderedRows.isEmpty)
 
-                      const Center(child: Text("No complaints found for the selected filters."))
+                      const Center(child: w.Text("No complaints found for the selected filters."))
 
                     else
 
@@ -1027,34 +1046,34 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                           columns: const [
 
-                            DataColumn(label: Text('Customer')),
+                            DataColumn(label: w.Text('Customer')),
 
-                            DataColumn(label: Text('Address')),
-                            DataColumn(label: Text('Phone')),
-
-
-                            DataColumn(label: Text('Allotted To')),
-
-                            DataColumn(label: Text('Status')),
-
-                            DataColumn(label: Text('Brand')),
-
-                            DataColumn(label: Text('Category')),
-
-                            DataColumn(label: Text('Product')),
-
-                            DataColumn(label: Text('Warranty Date')),
-
-                            DataColumn(label: Text('Purchase Date')),
-                            DataColumn(label: Text('Date of Complaint')),
-
-                            DataColumn(label: Text('Visit Date')),
-                            DataColumn(label: Text('Solve Date')),
+                            DataColumn(label: w.Text('Address')),
+                            DataColumn(label: w.Text('Phone')),
 
 
-                            DataColumn(label: Text('Dealer')),
+                            DataColumn(label: w.Text('Allotted To')),
 
-                            DataColumn(label: Text('Location')),
+                            DataColumn(label: w.Text('Status')),
+
+                            DataColumn(label: w.Text('Brand')),
+
+                            DataColumn(label: w.Text('Category')),
+
+                            DataColumn(label: w.Text('Product')),
+
+                            DataColumn(label: w.Text('Warranty Date')),
+
+                            DataColumn(label: w.Text('Purchase Date')),
+                            DataColumn(label: w.Text('Date of Complaint')),
+
+                            DataColumn(label: w.Text('Visit Date')),
+                            DataColumn(label: w.Text('Solve Date')),
+
+
+                            DataColumn(label: w.Text('Dealer')),
+
+                            DataColumn(label: w.Text('Location')),
 
                           ],
 
@@ -1110,7 +1129,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
         isExpanded: true,
 
-        hint: Text(
+        hint: w.Text(
 
           value ?? hint,
 
@@ -1122,7 +1141,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
           value: item,
 
-          child: Text(item, style: const TextStyle(fontSize: 14)),
+          child: w.Text(item, style: const TextStyle(fontSize: 14)),
 
         )).toList(),
 
