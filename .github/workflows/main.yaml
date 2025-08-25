@@ -32,7 +32,7 @@ jobs:
       # This step finds the Flutter SDK and adds it to the PATH
       - name: Find and Add Flutter to PATH
         run: |
-          # Find the Flutter directory and add it to the GITHUB_PATH
+       # Find the Flutter directory and add it to the GITHUB_PATH
           echo "$(find / -name "flutter" -type d -print -quit)/bin" >> $GITHUB_PATH
 
       - name: Verify Node and NPM installation
