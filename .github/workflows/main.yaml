@@ -28,12 +28,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Use a recent LTS version
-
-      # This step finds the Flutter SDK and adds it to the PATH
-      - name: Find and Add Flutter to PATH
-        run: |
-       # Find the Flutter directory and add it to the GITHUB_PATH
-          echo "$(find / -name "flutter" -type d -print -quit)/bin" >> $GITHUB_PATH
+#
+#      # This step finds the Flutter SDK and adds it to the PATH
+#      - name: Find and Add Flutter to PATH
+#        run: |
+#       # Find the Flutter directory and add it to the GITHUB_PATH
+#          echo "$(find / -name "flutter" -type d -print -quit)/bin" >> $GITHUB_PATH
 
       - name: Verify Node and NPM installation
         run: |
