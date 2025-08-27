@@ -107,6 +107,12 @@ jobs:
         run: flutter build web --release --wasm
       - name: Deploy to Firebase production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: firebase deploy --only hosting --project limsoncrm
+        run:
+          |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
+          
+          firebase use limsoncrm --token "${{ secrets.FIREBASE_TOKEN }}" 
+          
+          firebase deploy --only hosting --project limsoncrm
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
