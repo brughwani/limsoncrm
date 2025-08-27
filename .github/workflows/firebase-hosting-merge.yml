@@ -21,24 +21,40 @@ jobs:
           channel: 'stable'
           cache: true
           cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
-          cache-path: |
-            ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+
+      #          cache-path: |
+      #            ~/.pub-cache,.dart_tool,/opt/hostedtoolcache/flutter
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Use a recent LTS version
-
-      # This step finds the Flutter SDK and adds it to the PATH
-      - name: Find and Add Flutter to PATH
-        run: |
-          # Find the Flutter directory and add it to the GITHUB_PATH
-          echo "$(find / -name "flutter" -type d -print -quit)/bin" >> $GITHUB_PATH
+      #
+      #      # This step finds the Flutter SDK and adds it to the PATH
+      #      - name: Find and Add Flutter to PATH
+      #        run: |
+      #       # Find the Flutter directory and add it to the GITHUB_PATH
+      #          echo "$(find / -name "flutter" -type d -print -quit)/bin" >> $GITHUB_PATH
 
       - name: Verify Node and NPM installation
         run: |
           node -v
           npm -v
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Verify Dart and Flutter
         run: |
@@ -88,74 +104,9 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Build web release
-        run: flutter build web --release
-
-      - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
-          projectId: limsoncrm
-          target: 'build/web'
-          # Remove channelId for production deployment
-          # channelId: 'pr-${{ github.event.number }}'
-
-#name: Build and Deploy Web App
-#on:
-#  push:
-#    branches:
-#      - main
-#jobs:
-#  hosting:
-#    name: Deploy Website
-#    runs-on: ubuntu-latest
-#    steps:
-#      # Checkout Repository
-#      - uses: actions/checkout@v3
-#
-#      # Install Flutter command
-#      - name: Install flutter
-#      - uses: subosito/flutter-action@v2
-#        with:
-#          channel: "stable"
-#      - run: flutter --version
-#
-#      # Build Website
-#      - name: Build Website
-#      - run: |
-#          flutter clean
-#          flutter pub get
-#          flutter build web --release
-#        working-directory: ./
-#
-#      - name: Install FlutterFire CLI
-#        run: |
-#                dart pub global activate flutterfire_cli
-#
-#      - name: Configure Firebase Options
-#        run: |
-#              flutterfire configure \
-#                --project=limsoncrm \
-#                --web \
-#                --out=lib/firebase_options.dart
-#        env:
-#              FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-#
-##      - name: Install dependencies
-##        run: flutter pub get
-#
-##      - name: Build web app
-##        run: |
-##                flutter clean
-##                flutter pub get
-##                flutter build web --release
-##        working-directory: ./
-#      # Deploy Firebase Hosting
-#      - name: Deploy Firebase Hosting
-#        uses: w9jds/firebase-action@master
-#        with:
-#          args: deploy --only hosting:limsoncrm
-#        env:
-#          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-#          PROJECT_PATH: ./build/web
+        run: flutter build web --release --wasm
+      - name: Deploy to Firebase production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: firebase deploy --only hosting --project limsoncrm
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
