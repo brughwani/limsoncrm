@@ -163,6 +163,9 @@ self.addEventListener('message', (event) => {
     return;
   }
 });
+
+self.skipWaiting();
+self.clients.claim();
 // Download offline will check the RESOURCES for all files not in the cache
 // and populate them.
 async function downloadOffline() {
