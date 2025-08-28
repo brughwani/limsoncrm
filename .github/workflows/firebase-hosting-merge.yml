@@ -110,6 +110,8 @@ jobs:
         run:
           |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
+          npx firebase-tools deploy --only hosting --project limsoncrm --non-interactive
+          
           
           firebase use limsoncrm --token "${{ secrets.FIREBASE_TOKEN }}" 
           
