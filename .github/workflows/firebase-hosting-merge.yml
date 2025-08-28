@@ -104,7 +104,10 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Build web release
-        run: flutter build web --release --wasm
+        run:
+          |
+          flutter clean
+          flutter build web --release --wasm
       - name: Deploy to Firebase production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run:
