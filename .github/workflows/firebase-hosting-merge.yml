@@ -19,7 +19,7 @@ jobs:
         id: flutter-setup # Added this ID to reference the action's outputs
         with:
           channel: 'stable'
-          cache: true
+          cache: false
           cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
 
       - name: Cache pub packages
@@ -107,7 +107,8 @@ jobs:
         run:
           |
           flutter clean
-          flutter build web --release --wasm
+          flutter build web --release --web-renderer html
+    #      flutter build web --release --wasm
       - name: Deploy to Firebase production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run:
