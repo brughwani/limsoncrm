@@ -1,3 +1,4 @@
+
 {
   "hosting": {
     "public": "build/web",
@@ -24,13 +25,13 @@
         ]
       },
       {
-        "source": "**/*.js",
+        "source": "**/main.dart.js",
         "headers": [
-          { "key": "Cache-Control", "value": "no-cache" }
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
         ]
       },
       {
-        "source": "**/*.@(js|css|png|jpg|jpeg|gif|svg|ico|json)",
+        "source": "**/*.@(css|png|jpg|jpeg|gif|svg|ico)",
         "headers": [
           { "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }
         ]
@@ -47,8 +48,6 @@
         "destination": "/index.html"
       }
     ]
-
-
   }
 }
 
