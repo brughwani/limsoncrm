@@ -94,6 +94,9 @@ jobs:
           }
           EOF
           
+          echo "${{ secrets.FIREBASE_APP_ID }}"
+          echo "${{ secrets.FIREBASE_PROJECT_ID }}"
+          
           flutter pub global run flutterfire_cli:flutterfire configure \
             --project=${{ secrets.FIREBASE_PROJECT_ID }} \
             --platforms=web \
