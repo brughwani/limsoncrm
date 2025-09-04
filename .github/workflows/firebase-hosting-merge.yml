@@ -76,45 +76,45 @@ jobs:
       # New step to deactivate the old version and activate the latest
       # Manually download and install flutterfire_cli to bypass pub issues
       # Manually download and install flutterfire_cli to bypass pub issues
-      - name: Activate FlutterFire CLI
-        run: dart pub global activate flutterfire_cli
-      - name: Authenticate Firebase CLI
-        run: firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
-
-
-      - name: Generate Firebase Options Securely
-        run: |
-          flutter clean
-          flutter pub global activate flutterfire_cli
-          flutterfire configure \
-            --project=${{ secrets.FIREBASE_PROJECT_ID }} \
-            --platforms=web \
-            --out=lib/firebase_options.dart --yes
-#          cat > firebase_config.json <<EOF
-#          {
-#           "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
-#           "appId": "${{ secrets.FIREBASE_APP_ID }}",
-#           "apiKey": "${{ secrets.FIREBASE_API_KEY }}",
-#           "authDomain": "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-#           "storageBucket": "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-#           "measurementId": "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
-#           "messagingSenderId": "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
-#          }
-#          EOF
+#      - name: Activate FlutterFire CLI
+#        run: dart pub global activate flutterfire_cli
+#      - name: Authenticate Firebase CLI
+#        run: firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
 #
-#          echo "${{ secrets.FIREBASE_APP_ID }}"
-#          echo "${{ secrets.FIREBASE_PROJECT_ID }}"
 #
-#          flutter pub global run flutterfire_cli:flutterfire configure \
-#            --project=limsoncrm \
+#      - name: Generate Firebase Options Securely
+#        run: |
+#          flutter clean
+#          flutter pub global activate flutterfire_cli
+#          flutterfire configure \
+#            --project=${{ secrets.FIREBASE_PROJECT_ID }} \
 #            --platforms=web \
-#            --out=lib/firebase_options.dart \
-#            --yes \
-          
-          
- #         rm firebase_config.json
-        env:
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}
+#            --out=lib/firebase_options.dart --yes
+##          cat > firebase_config.json <<EOF
+##          {
+##           "projectId": "${{ secrets.FIREBASE_PROJECT_ID }}",
+##           "appId": "${{ secrets.FIREBASE_APP_ID }}",
+##           "apiKey": "${{ secrets.FIREBASE_API_KEY }}",
+##           "authDomain": "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+##           "storageBucket": "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+##           "measurementId": "${{ secrets.FIREBASE_MEASUREMENT_ID }}",
+##           "messagingSenderId": "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}"
+##          }
+##          EOF
+##
+##          echo "${{ secrets.FIREBASE_APP_ID }}"
+##          echo "${{ secrets.FIREBASE_PROJECT_ID }}"
+##
+##          flutter pub global run flutterfire_cli:flutterfire configure \
+##            --project=limsoncrm \
+##            --platforms=web \
+##            --out=lib/firebase_options.dart \
+##            --yes \
+#
+#
+# #         rm firebase_config.json
+#        env:
+#          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}
 
       - name: Build web release
         run:
