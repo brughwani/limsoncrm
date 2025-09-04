@@ -107,24 +107,32 @@ jobs:
           
  #         rm firebase_config.json
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: service_account.json
+          fire: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}
 
       - name: Build web release
         run:
           |
           
           flutter build web --release --pwa-strategy=none
-      - name: Deploy to Firebase production
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run:
-          |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
-          export GOOGLE_APPLICATION_CREDENTIALS="service_account.json"
-          firebase hosting:sites:list --project limsoncrm
-          npx firebase-tools deploy --only hosting --project limsoncrm --non-interactive
-          rm -f service_account.json
-          
-          
+      - name: 🎯 Deploy to firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+            repoToken: "${{ secrets.GITHUB_TOKEN }}"
+            firebaseServiceAccount: "${{ secrets.$FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}"
+            channelId: live
+            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+
+  #      - name: Deploy to Firebase production
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        run:
+#          |
+#          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
+#          export GOOGLE_APPLICATION_CREDENTIALS="service_account.json"
+#          firebase hosting:sites:list --project limsoncrm
+#          npx firebase-tools deploy --only hosting --project limsoncrm --non-interactive
+#          rm -f service_account.json
+#
+#
 
  #         firebase deploy --only hosting:limsoncrm --project limsoncrm
 
