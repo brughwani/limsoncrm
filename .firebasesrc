@@ -5,7 +5,7 @@
 "targets": {
 "limsoncrm": {
 "hosting": {
-"your-site": ["lmrepaircrmadmin"]
+"your-site": ["limsoncrm"]
 }
 }
 }
