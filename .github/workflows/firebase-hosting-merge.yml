@@ -98,7 +98,7 @@ jobs:
           echo "${{ secrets.FIREBASE_PROJECT_ID }}"
           
           flutter pub global run flutterfire_cli:flutterfire configure \
-            --project=${{ secrets.FIREBASE_PROJECT_ID }} \
+            --project=limsoncrm \
             --platforms=web \
             --out=lib/firebase_options.dart \
             --yes \
