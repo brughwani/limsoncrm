@@ -1,7 +1,7 @@
 {
-    "name": "lmrepaircrmadmin",
-    "short_name": "lmrepaircrmadmin",
-    "start_url": ".",
+    "name": "limsoncrm",
+    "short_name": "limsoncrm",
+    "start_url": "limsoncrm.web.app",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
