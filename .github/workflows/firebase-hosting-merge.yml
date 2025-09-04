@@ -107,7 +107,7 @@ jobs:
           
  #         rm firebase_config.json
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: service_account.json
 
       - name: Build web release
         run:
