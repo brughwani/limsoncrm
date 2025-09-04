@@ -119,14 +119,8 @@ jobs:
         run:
           |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
-        # firebase use limsoncrm --token "${{ secrets.FIREBASE_TOKEN }}"
           export GOOGLE_APPLICATION_CREDENTIALS="service_account.json"
-          
-          
-          
           firebase hosting:sites:list --project limsoncrm
-          
-          
           npx firebase-tools deploy --only hosting --project limsoncrm --non-interactive
           rm -f service_account.json
           
