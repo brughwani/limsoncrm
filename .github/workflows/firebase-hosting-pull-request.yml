@@ -87,4 +87,4 @@ jobs:
           projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
           target: "dev"
           # Remove channelId for production deployment
-          channelId: 'pr-${{ github.event.number }}'
+          channelId: 'dev'
