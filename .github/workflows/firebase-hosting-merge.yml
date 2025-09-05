@@ -93,7 +93,7 @@ jobs:
             repoToken: "${{ secrets.GITHUB_TOKEN }}"
             firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}"
             channelId: live
-            target: prod
+#            target: prod
             projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
 
 #  #      - name: Deploy to Firebase production
