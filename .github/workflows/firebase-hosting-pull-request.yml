@@ -84,7 +84,7 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           #FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
-          projectId: limsoncrm
-          target: 'build/web'
+          projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+          target: limsoncrm
           # Remove channelId for production deployment
           channelId: 'pr-${{ github.event.number }}'
