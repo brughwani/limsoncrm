@@ -121,18 +121,26 @@ jobs:
           |
           
           flutter build web --release --pwa-strategy=none
-  
 
-      - name: 🎯 Deploy to firebase
+      - name: Deploy to Firebase Prod
+        if: github.ref == 'refs/heads/main'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-            repoToken: "${{ secrets.GITHUB_TOKEN }}"
-            firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}"
-            channelId: live
-            target: prod
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
-
-  #      - name: Deploy to Firebase production
+        repoToken: '${{ secrets.GITHUB_TOKEN }}'
+        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+        projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+        target: 'limsoncrm'
+        channelId: live
+#      - name: 🎯 Deploy to firebase
+#        uses: FirebaseExtended/action-hosting-deploy@v0
+#        with:
+#            repoToken: "${{ secrets.GITHUB_TOKEN }}"
+#            firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}"
+#            channelId: live
+#            target: prod
+#            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+#
+#  #      - name: Deploy to Firebase production
 #        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 #        run:
 #          |

@@ -76,15 +76,25 @@ jobs:
       # Manually download and install flutterfire_cli to bypass pub issues
       - name: Activate FlutterFire CLI
         run: dart pub global activate flutterfire_cli
-
-
-      - name: Deploy to Firebase
+  # 👇 This step handles staging deploys (dev branch)
+      - name: Deploy to Firebase Staging
+        if: github.ref == 'refs/heads/dev'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          #FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
-          projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
-          target: "limsoncrm-dev"
-          # Remove channelId for production deployment
-          channelId: 'pr-${{ github.event.number }}'
+            repoToken: '${{ secrets.GITHUB_TOKEN }}'
+            firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+            projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+            target: 'limsoncrm-dev'
+            channelId: live
+
+#
+#      - name: Deploy to Firebase
+#        uses: FirebaseExtended/action-hosting-deploy@v0
+#        with:
+#          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+#          #FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
+#          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+#          projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+#          target: "limsoncrm-dev"
+#          # Remove channelId for production deployment
+#          channelId: 'pr-${{ github.event.number }}'
