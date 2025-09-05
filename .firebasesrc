@@ -1,12 +1,17 @@
 {
-"projects": {
-"default": "limsoncrm"
-},
-"targets": {
-"limsoncrm": {
-"hosting": {
-"your-site": ["limsoncrm"]
-}
-}
-}
+  "projects": {
+    "default": "limsoncrm"
+  },
+  "targets": {
+    "limsoncrm": {
+      "hosting": {
+        "dev": [
+          "limsoncrm-dev"
+        ],
+        "prod": [
+          "limsoncrm"
+        ]
+      }
+    }
+  }
 }
