@@ -76,7 +76,13 @@ jobs:
       # Manually download and install flutterfire_cli to bypass pub issues
       - name: Activate FlutterFire CLI
         run: dart pub global activate flutterfire_cli
-  # 👇 This step handles staging deploys (dev branch)
+      - name: Build web dev
+        run:
+          |
+
+          flutter build web --profile --pwa-strategy=none
+
+      # 👇 This step handles staging deploys (dev branch)
       - name: Deploy to Firebase Staging
         if: github.ref == 'refs/heads/dev'
         uses: FirebaseExtended/action-hosting-deploy@v0
