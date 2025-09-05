@@ -1,6 +1,8 @@
 
 {
   "hosting": {
+    "target": "limsoncrm",
+
     "public": "build/web",
     "headers": [
       {
