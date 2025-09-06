@@ -79,7 +79,9 @@ jobs:
       - name: Build web dev
         run:
           |
-
+          
+          rm build/web/flutter_service_worker.js
+          flutter clean
           flutter build web --profile --pwa-strategy=none
 
       # 👇 This step handles staging deploys (dev branch)
