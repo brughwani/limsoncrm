@@ -83,6 +83,12 @@ jobs:
           rm build/web/flutter_service_worker.js
           flutter clean
           flutter build web --profile --pwa-strategy=none
+      - name: Remove Flutter service worker for staging
+        if: github.ref_name == 'dev'
+        run: |
+            if [ -f build/web/flutter_service_worker.js ]; then
+            rm build/web/flutter_service_worker.js
+            fi
 
       # 👇 This step handles staging deploys (dev branch)
       - name: Deploy to Firebase Staging
