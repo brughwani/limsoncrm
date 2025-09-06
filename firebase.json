@@ -39,7 +39,7 @@
       ]
     },
     {
-      "target": "prod",
+      "target": "limsoncrm",
       "public": "build/web",
       "ignore": [
         "firebase.json",
