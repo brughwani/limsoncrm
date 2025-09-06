@@ -60,66 +60,6 @@ class ComplaintDataNotifier extends ChangeNotifier {
 
 
 
-  // Future<void> fetchInitialData(String token) async {
-  //   // if (_isLoading) return;
-  //
-  //   print("Starting data fetch...");
-  //
-  //   if (_isLoading) {
-  //     print("[FETCH] Already loading, skipping");
-  //     return;
-  //   }
-  //
-  //
-  //   //_isLoading = false;
-  //   else {
-  //     setLoading(true);
-  //
-  //     print("[LOADING] Set to TRUE");
-  //   //  notifyListeners();
-  //     // _isLoading = true;
-  //     // notifyListeners();
-  //     try {
-  //       print("[FETCH] Loading employees and brands");
-  //       await Future.wait([
-  //         _fetchEmployees(token),
-  //         _fetchBrands(token),
-  //       ]);
-  //
-  //       print("[FETCH] Loading complaints");
-  //       await _loadAllComplaints(token);
-  //
-  //       print("[DATA] Loaded ${_allComplaints.length} complaints");
-  //       _orderedRows = List.from(_allComplaints);
-  //     } catch (e, stack) {
-  //       _allComplaints = [];
-  //       _orderedRows = [];
-  //
-  //       print("[ERROR] Fetch failed: $e\n$stack");
-  //     } finally {
-  //       _isLoading = false;
-  //       print("[LOADING] Set to FALSE");
-  //       notifyListeners();
-  //       print("[FETCH] Completed. Notified listeners");
-  //     }
-  //   }
-
-    // try {
-    //   // Fetch data
-    //   await _fetchEmployees(token);
-    //   await _fetchBrands(token);
-    //   await _loadAllComplaints(token);
-    //
-    //   _orderedRows = List.from(_allComplaints);
-    //   // notifyListeners();
-    // } catch (e) {
-    //   _allComplaints = [];
-    //   _orderedRows = [];
-    // } finally {
-    //   _isLoading = false;
-    //   notifyListeners();
-    // }
-
 Future<void> fetchInitialData(String token) async {
   print("[DEBUG NOTIFIER] fetchInitialData START"); // <-- ADD THIS
   if (_isLoading) {
@@ -128,34 +68,25 @@ Future<void> fetchInitialData(String token) async {
   }
 
   _isLoading = true;
- // print("[DEBUG NOTIFIER] Setting _isLoading to TRUE. Notifying listeners for loading start."); // <-- ADD THIS
-  notifyListeners(); // Notify listeners that loading has started
+   notifyListeners(); // Notify listeners that loading has started
 
 
   try {
- //   print("[DEBUG NOTIFIER] Fetching employees and brands..."); // <-- ADD THIS
     await Future.wait([
       _fetchEmployees(token),
       _fetchBrands(token),
     ]);
-  //  print("[DEBUG NOTIFIER] Employees and brands fetched."); // <-- ADD THIS
-
-  //  print("[DEBUG NOTIFIER] Loading complaints..."); // <-- ADD THIS
     await _loadAllComplaints(token); // This populates _allComplaints
- //   print("[DEBUG NOTIFIER] Complaints loaded. _allComplaints.length: ${_allComplaints.length}"); // <-- ADD THIS
 
     _orderedRows = List.from(_allComplaints);
-  //  print("[DEBUG NOTIFIER] _orderedRows initialized. Length: ${_orderedRows.length}"); // <-- ADD THIS
 
   } catch (e, stack) {
     _allComplaints = [];
     _orderedRows = [];
- //   print("[DEBUG NOTIFIER] ERROR in fetchInitialData: $e\n$stack"); // <-- ADD THIS
-  } finally {
+   } finally {
     _isLoading = false; // Set loading state to false
- //   print("[DEBUG NOTIFIER] Setting _isLoading to FALSE. Notifying listeners for loading end."); // <-- ADD THIS
     notifyListeners(); // Notify listeners that loading has completed and data is ready
-  //  print("[DEBUG NOTIFIER] fetchInitialData END (notifyListeners called)."); // <-- ADD THIS
+
   }
 }
   Future<void> _fetchEmployees(String token) async {
@@ -255,107 +186,11 @@ Future<void> fetchInitialData(String token) async {
       'servicetype': servicetype, 'source': source,
     };
 
-  //   _orderedRows = _allComplaints.where((complaint) {
-  //     // Create a list to store filter results
-  //     final List<bool> filterResults = [];
-  //
-  //     // Helper function to add filter results
-  //     void addFilterResult(bool result) {
-  //       filterResults.add(result);
-  //     }
-  //
-  //     // 1. Date Range Filters
-  //     addFilterResult(_passesDateFilter(
-  //         complaint.complaintDate,
-  //         fromdate,
-  //         todate
-  //     ));
-  //
-  //     // 2. Text Field Filters
-  //     addFilterResult(_passesTextFilter(
-  //         complaint.nameController.text,
-  //         name
-  //     ));
-  //
-  //     addFilterResult(_passesTextFilter(
-  //         complaint.phoneNumber,
-  //         phone
-  //     ));
-  //
-  //     // 3. Dropdown Filters
-  //     addFilterResult(_passesDropdownFilter(
-  //         complaint.village,
-  //         village,
-  //         placeholder: 'Select a location'
-  //     ));
-  //
-  //     addFilterResult(_passesDropdownFilter(
-  //         complaint.dealer,
-  //         dealer,
-  //         placeholder: 'Select a dealer'
-  //     ));
-  //
-  //     addFilterResult(_passesDropdownFilter(
-  //         complaint.brand,
-  //         brandName,
-  //         placeholder: 'Select a brand'
-  //     ));
-  //
-  //     addFilterResult(_passesDropdownFilter(
-  //         complaint.category,
-  //         category,
-  //         placeholder: 'Select a category'
-  //     ));
-  //
-  //     addFilterResult(_passesDropdownFilter(
-  //         complaint.product,
-  //         product,
-  //         placeholder: 'Select a product'
-  //     ));
-  //
-  //     // 4. Employee Filter
-  //     addFilterResult(_passesEmployeeFilter(
-  //         complaint.employee,
-  //         allottedTo
-  //     ));
-  //
-  //     // 5. Service Type and Source
-  //     addFilterResult(_passesTextFilter(
-  //         complaint.serviceType,
-  //         servicetype
-  //     ));
-  //
-  //     addFilterResult(_passesTextFilter(
-  //         complaint.source,
-  //         source
-  //     ));
-  //
-  //     // Apply AND logic: All active filters must pass
-  //     return !filterResults.contains(false);
-  //   }).toList();
-  //
-  //   final clearAll = fromdate == null && todate == null && name == null &&
-  //       phone == null && village == null && dealer == null &&
-  //       brandName == null && category == null && product == null &&
-  //       allottedTo == null && servicetype == null && source == null;
-  //
-  //   if (clearAll) {
-  //     _orderedRows = List.from(_allComplaints);
-  //     notifyListeners();
-  //     return;
-  //   }
-  //
-  //   notifyListeners();
-  // }
 
     final fromDateParsed = (fromdate != null && fromdate.isNotEmpty) ? DateTime.tryParse(fromdate) : null;
     final toDateParsed = (todate != null && todate.isNotEmpty) ? DateTime.tryParse(todate) : null;
 
     _orderedRows = _allComplaints.where((complaint) {
-      // 1. Date Range Filters - Early exit if fails
-      // if (!_passesDateFilter(complaint.complaintDate, fromdate, todate)) {
-      //   return false;
-      // }
 
       final complaintDateParsed = (complaint.complaintDate.isNotEmpty)
           ? DateFormat('dd-MM-yyyy').parse(complaint.complaintDate)
@@ -396,39 +231,7 @@ Future<void> fetchInitialData(String token) async {
   }
 // Helper methods for each filter type
   bool _passesDateFilter(DateTime complaintDate, DateTime? fromDate, DateTime? toDate) {
-//     if (from == null && to == null) return true;
-//
-//     // final date = DateTime.tryParse(complaintDate);
-//     // if (date == null) return false;
-//     DateTime? date;
-//     try {
-//        date = DateFormat('dd-MM-yyyy').parseStrict(complaintDate);
-//     } catch (e) {
-//       // If parsing fails, the complaint does not pass the date filter.
-//       return false;
-//     }
-//     if (date == null) return false;
-//     final fromDate = from != null ? DateTime.tryParse(from) : null;
-//     final toDate = to != null ? DateTime.tryParse(to) : null;
-//
-// // Check if the complaint date is before the "from" date.
-//     if (fromDate != null && date.isBefore(fromDate)) return false;
-//
-//     // Check if the complaint date is after the "to" date.
-//     // We add a day to the 'to' date to make the filter inclusive of the entire day.
-//     if (toDate != null) {
-//       final adjustedToDate = toDate.add(const Duration(days: 1));
-//       if (date.isAfter(adjustedToDate)) {
-//         return false;
-//       }
-//     }
-//
-//     return true;
 
-    // if (fromDate != null && date.isBefore(fromDate)) return false;
-    // if (toDate != null && date.isAfter(toDate)) return false;
-    //
-    // return true;
     if (fromDate == null && toDate == null) {
       return true;
     }
