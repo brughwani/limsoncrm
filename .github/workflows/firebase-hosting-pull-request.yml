@@ -80,7 +80,7 @@ jobs:
         run:
           |
           
-          rm build/web/flutter_service_worker.js
+#          rm build/web/flutter_service_worker.js
           flutter clean
           flutter build web --profile --pwa-strategy=none
       - name: Remove Flutter service worker for staging
