@@ -1047,10 +1047,10 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
                           columns: const [
 
                             DataColumn(label: w.Text('Customer')),
-
-                            DataColumn(label: w.Text('Address')),
-                            DataColumn(label: w.Text('Phone')),
-
+                            //
+                            // DataColumn(label: w.Text('Address')),
+                            // DataColumn(label: w.Text('Phone')),
+                            //
 
                             DataColumn(label: w.Text('Allotted To')),
 
@@ -1207,32 +1207,33 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
       ),
 
-      DataCell(
-          CellWidget<String>(
-            isTextField: true,
+      // DataCell(
+      //     CellWidget<String>(
+      //       isTextField: true,
+      //
+      //       value: state.address,
+      //
+      //       controller: state.addressController,
+      //
+      //       onChanged: state.updateaddress,
+      //
+      //     )
+      // ),
+      //
 
-            value: state.address,
-
-            controller: state.addressController,
-
-            onChanged: state.updateaddress,
-
-          )
-      ),
-
-      DataCell(
-       CellWidget<String>(
-         isTextField: true,
-
-         value: state.phoneNumber,
-
-         controller: state.phoneController,
-
-         onChanged: state.updatephone,
-
-       )
-      ),
-
+      //
+      // DataCell(
+      //  CellWidget<String>(
+      //    isTextField: true,
+      //
+      //    value: state.phoneNumber,
+      //
+      //    controller: state.phoneController,
+      //
+      //    onChanged: state.updatephone,
+      //
+      //  )
+      // ),
       DataCell(
 
         Consumer<ComplaintDataNotifier>(
