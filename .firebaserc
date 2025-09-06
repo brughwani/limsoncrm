@@ -6,11 +6,11 @@
   "targets": {
     "limsoncrm": {
       "hosting": {
-        "prod": [
-          "limsoncrm"
-        ],
-        "dev": [
+        "limsoncrm-dev": [
           "limsoncrm-dev"
+        ],
+        "limsoncrm": [
+          "limsoncrm"
         ]
       }
     }
