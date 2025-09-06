@@ -69,11 +69,7 @@ jobs:
       - name: Install Firebase Tools
         run: |
           npm install -g firebase-tools
-      # Use a new step to update and verify the flutterfire_cli version
-      # New step to deactivate the old version and activate the latest
-      # New step to deactivate the old version and activate the latest
-      # Manually download and install flutterfire_cli to bypass pub issues
-      # Manually download and install flutterfire_cli to bypass pub issues
+
       - name: Activate FlutterFire CLI
         run: dart pub global activate flutterfire_cli
       - name: Build web dev
