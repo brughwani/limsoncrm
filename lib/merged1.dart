@@ -657,14 +657,6 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
     // Update UI lists from notifier
 
-          print("Building Consumer - isLoading: ${notifier.isLoading}, rows: ${notifier.orderedRows.length}");
-          // CRITICAL: Force a unique print string to ensure this code path is executing
-          print("******** NEW CONSUMER BUILD DETECTED ********");
-          print("[UI-DEBUG-CONSUMER] BUILD triggered. Consumer's Notifier Hash: ${notifier.hashCode}");
-          print("[UI-DEBUG-CONSUMER]   notifier.isLoading: ${notifier.isLoading}"); // THIS IS THE KEY VALUE
-          print("[UI-DEBUG-CONSUMER]   notifier.orderedRows.length: ${notifier.orderedRows.length}");
-          print("*********************************************");
-
 
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
