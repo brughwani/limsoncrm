@@ -77,7 +77,7 @@ jobs:
           flutter clean
           
           
-          flutter build web --release --pwa-strategy=none --force
+          flutter build web --release --pwa-strategy=none
 
 #      - name: Deploy to Firebase Prod
 #        if: github.ref == 'refs/heads/main'
