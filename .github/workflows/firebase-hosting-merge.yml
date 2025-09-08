@@ -74,6 +74,8 @@ jobs:
       - name: Build web release
         run:
           |
+          flutter clean
+          
           
           flutter build web --release --pwa-strategy=none
 
