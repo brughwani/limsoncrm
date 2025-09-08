@@ -45,7 +45,7 @@ class _AddEmployeeState extends State<AddEmployee> {
     "Last name",
     "address",
     "Phone",
-    "Salary",
+    "salary",
     "Role",
   ];
 
@@ -301,7 +301,7 @@ class _AddEmployeeState extends State<AddEmployee> {
                  ElevatedButton(onPressed: (){
 
 
-            _futureEmployees=employeeProvider.fetchEmployees(employeeProvider.selectedFields) as Future<List<Map<String, dynamic>>>?;
+            _futureEmployees=employeeProvider.fetchEmployees(widget.token,employeeProvider.selectedFields) as Future<List<Map<String, dynamic>>>?;
 
 
 
