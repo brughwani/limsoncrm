@@ -10,16 +10,19 @@
 .svn/
 migrate_working_dir/
 assets/.env
-lib/firebase_options.dart
+
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 *.comments
 # IntelliJ related
 *.iml
+
 *.ipr
 *.iws
 .idea/
-
+build/
+.firebase/
+.firebase/hosting.*
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.

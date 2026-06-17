@@ -58,6 +58,7 @@ class ComplaintDataNotifier extends ChangeNotifier {
     }
   }
 
+<<<<<<< HEAD
   // Future<void> fetchInitialData(String token) async {
   //   // if (_isLoading) return;
   //
@@ -157,6 +158,39 @@ class ComplaintDataNotifier extends ChangeNotifier {
     }
   }
 
+=======
+
+
+Future<void> fetchInitialData(String token) async {
+  print("[DEBUG NOTIFIER] fetchInitialData START"); // <-- ADD THIS
+  if (_isLoading) {
+    print("[DEBUG NOTIFIER] Already loading, skipping. _isLoading: $_isLoading"); // <-- ADD THIS
+    return;
+  }
+
+  _isLoading = true;
+   notifyListeners(); // Notify listeners that loading has started
+
+
+  try {
+    await Future.wait([
+      _fetchEmployees(token),
+      _fetchBrands(token),
+    ]);
+    await _loadAllComplaints(token); // This populates _allComplaints
+
+    _orderedRows = List.from(_allComplaints);
+
+  } catch (e, stack) {
+    _allComplaints = [];
+    _orderedRows = [];
+   } finally {
+    _isLoading = false; // Set loading state to false
+    notifyListeners(); // Notify listeners that loading has completed and data is ready
+
+  }
+}
+>>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
   Future<void> _fetchEmployees(String token) async {
     try {
       final response = await http.get(
@@ -273,6 +307,7 @@ class ComplaintDataNotifier extends ChangeNotifier {
       'source': source,
     };
 
+<<<<<<< HEAD
     //   _orderedRows = _allComplaints.where((complaint) {
     //     // Create a list to store filter results
     //     final List<bool> filterResults = [];
@@ -365,6 +400,8 @@ class ComplaintDataNotifier extends ChangeNotifier {
     //
     //   notifyListeners();
     // }
+=======
+>>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
 
     final fromDateParsed = (fromdate != null && fromdate.isNotEmpty)
         ? DateTime.tryParse(fromdate)
@@ -374,10 +411,6 @@ class ComplaintDataNotifier extends ChangeNotifier {
         : null;
 
     _orderedRows = _allComplaints.where((complaint) {
-      // 1. Date Range Filters - Early exit if fails
-      // if (!_passesDateFilter(complaint.complaintDate, fromdate, todate)) {
-      //   return false;
-      // }
 
       final complaintDateParsed = (complaint.complaintDate.isNotEmpty)
           ? DateFormat('dd-MM-yyyy').parse(complaint.complaintDate)
@@ -428,6 +461,7 @@ class ComplaintDataNotifier extends ChangeNotifier {
   }
 
 // Helper methods for each filter type
+<<<<<<< HEAD
   bool _passesDateFilter(
       DateTime complaintDate, DateTime? fromDate, DateTime? toDate) {
 //     if (from == null && to == null) return true;
@@ -458,11 +492,10 @@ class ComplaintDataNotifier extends ChangeNotifier {
 //     }
 //
 //     return true;
+=======
+  bool _passesDateFilter(DateTime complaintDate, DateTime? fromDate, DateTime? toDate) {
+>>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
 
-    // if (fromDate != null && date.isBefore(fromDate)) return false;
-    // if (toDate != null && date.isAfter(toDate)) return false;
-    //
-    // return true;
     if (fromDate == null && toDate == null) {
       return true;
     }

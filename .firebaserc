@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "dev": "limsoncrm",
+    "prod": "limsoncrm"
+  },
+  "targets": {
+    "limsoncrm": {
+      "hosting": {
+        "limsoncrm-dev": [
+          "limsoncrm-dev"
+        ],
+        "limsoncrm": [
+          "limsoncrm"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

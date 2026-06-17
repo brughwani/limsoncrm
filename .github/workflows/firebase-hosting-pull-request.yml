@@ -1,9 +1,9 @@
-name: Deploy to Firebase on Commit
+name: Deploy to Firebase on pr
 
 on:
   push:
     branches:
-      - main  # Change to your production branch (e.g., master, production)
+      - dev  # Change to your production branch (e.g., master, production)
     paths:
       - '**'  # Watch all files
 
@@ -19,10 +19,8 @@ jobs:
         id: flutter-setup # Added this ID to reference the action's outputs
         with:
           channel: 'stable'
-          cache: false
+          cache: true
           cache-key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
-
-
 
       - name: Cache pub packages
         uses: actions/cache@v4
@@ -71,45 +69,40 @@ jobs:
       - name: Install Firebase Tools
         run: |
           npm install -g firebase-tools
-      - name: Build web release
+
+      - name: Activate FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+      - name: Build web dev
         run:
           |
           flutter clean
-          
-          
-          flutter build web --release --pwa-strategy=none
+          flutter build web --profile --pwa-strategy=none
+      - name: Remove Flutter service worker for staging
+        if: github.ref_name == 'dev'
+        run: |
+            if [ -f build/web/flutter_service_worker.js ]; then
+            rm build/web/flutter_service_worker.js
+            fi
 
-#      - name: Deploy to Firebase Prod
-#        if: github.ref == 'refs/heads/main'
-#        uses: FirebaseExtended/action-hosting-deploy@v0
-#        with:
-#        repoToken: '${{ secrets.GITHUB_TOKEN }}'
-#        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
-#        projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
-#        target: 'limsoncrm'
-#        channelId: live
-      - name: 🎯 Deploy to firebase
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      # 👇 This step handles staging deploys (dev branch)
+      - name: Deploy to Firebase Staging
+        if: github.ref == 'refs/heads/dev'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-            repoToken: "${{ secrets.GITHUB_TOKEN }}"
-            firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}"
+            repoToken: '${{ secrets.GITHUB_TOKEN }}'
+            firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+            projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+            target: 'limsoncrm-dev'
             channelId: live
-            target: "limsoncrm"
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
 
-#  #      - name: Deploy to Firebase production
-#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#        run:
-#          |
-#          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}' > service_account.json
-#          export GOOGLE_APPLICATION_CREDENTIALS="service_account.json"
-#          firebase hosting:sites:list --project limsoncrm
-#          npx firebase-tools deploy --only hosting --project limsoncrm --non-interactive
-#          rm -f service_account.json
 #
-#
-
- #         firebase deploy --only hosting:limsoncrm --project limsoncrm
-
-
+#      - name: Deploy to Firebase
+#        uses: FirebaseExtended/action-hosting-deploy@v0
+#        with:
+#          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+#          #FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
+#          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LIMSONCRM }}'
+#          projectId: "${{ secrets.FIREBASE_PROJECT_ID }}"
+#          target: "limsoncrm-dev"
+#          # Remove channelId for production deployment
+#          channelId: 'pr-${{ github.event.number }}'

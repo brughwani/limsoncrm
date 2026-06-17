@@ -25,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     selectedValue = 'Admin';
   }
+<<<<<<< HEAD
 
   @override
   void dispose() {
@@ -168,6 +169,9 @@ class _MyHomePageState extends State<MyHomePage> {
 //     return false; // Error during authentication
 //   }
 // }
+=======
+
+>>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
 
   @override
   Widget build(BuildContext context) {
@@ -176,6 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Login Page'),
       ),
       body: Center(
+<<<<<<< HEAD
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -210,6 +215,39 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       )),
+=======
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+
+            TextFormField(
+              controller: username,
+              decoration: InputDecoration(labelText: "Phone"),
+              keyboardType: TextInputType.phone,
+            ),
+            TextFormField(
+              obscureText: true,
+              controller: password,
+              decoration: InputDecoration(
+                labelText: "Password"),
+            ),
+         
+            
+            Row(
+              children: [
+          
+            ElevatedButton(
+              onPressed: ()=> AuthService(baseUrl: 'https://limsonvercelapi2.vercel.app').authenticate(username.text,password.text,selectedValue.toString(),context),
+             // onPressed: () => validate(username.text, password.text),
+              child: Text('Login'),
+            ),
+          ],
+            ),
+             ],
+      )
+         ),
+         
+>>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
     );
   }
 }
