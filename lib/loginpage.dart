@@ -25,8 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     selectedValue = 'Admin';
   }
-<<<<<<< HEAD
-
   @override
   void dispose() {
     username.dispose();
@@ -103,75 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
-//
-// Future<void> validate(String phone,String password) async {
-//   // final apiKey = dotenv.env['AIRTABLE_API_KEY'];
-//   // final baseId = dotenv.env['AIRTABLE_BASE_ID'];
-//   // final tableName = dotenv.env['AIRTABLE_TABLE_NAME']; // Replace with your Airtable table name
-//
-//  // final url = 'https://api.airtable.com/v0/$baseId/$tableName?filterByFormula={empcode}="$employeeCode"'; // Use a filter formula to check the employee code
-// final url='https://limsonvercelapi2.vercel.app/api/fsauth';
-//   final response = await http.post(
-//     Uri.parse(url),
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: json.encode({
-//       'phone': phone,
-//       'password': password,
-//       'app': selectedValue?.toLowerCase(),
-//     }),
-//   );
-//   print(response.statusCode);
-//
-//
-//   if (response.statusCode == 200) {
-//     print('User logged in successfully.');
-//     var token=jsonDecode(response.body)['token'];
-//   //  Navigator.push(context, MaterialPageRoute(builder: (context) => Admindashboard()));
-//   Navigator.push(context, MaterialPageRoute(builder: (context) => CRMDashboard(token: token)));
-//     }
-//    else {
-//      print(response.body);
-//   print('Failed to fetch data: ${response.statusCode}');
-//
-//   }
-//      // Error during Airtable fetch
-//   }
-
-// Future<bool> signInWithEmployeeCode(String phone, String password) async {
-//   String username = phone+"@lmcrm.in";
-//   try {
-//     // Step 1: Sign in with Firebase
-//     // UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-//     //   email: username,
-//     //   password: password,
-//     // );
-//
-//     User? user = userCredential.user;
-//     if (user != null) {
-//       // Step 2: Validate the employee code against Airtable
-//       bool isValidCode = await validate(username, password);
-//
-//       if (isValidCode) {
-//         print('User logged in successfully.');
-//         return true; // Login successful
-//       } else {
-//         print('Invalid employee code.');
-//         return false; // Invalid employee code
-//       }
-//     } else {
-//       print('User not found.');
-//       return false; // User not found
-//     }
-//   } on FirebaseAuthException catch (e) {
-//     print('Error: ${e.message}');
-//     return false; // Error during authentication
-//   }
-// }
-=======
-
->>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
 
   @override
   Widget build(BuildContext context) {
@@ -180,46 +109,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Login Page'),
       ),
       body: Center(
-<<<<<<< HEAD
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text("1"),
-          TextFormField(
-            controller: username,
-            decoration: InputDecoration(labelText: "Phone"),
-            keyboardType: TextInputType.phone,
-          ),
-          TextFormField(
-            obscureText: true,
-            controller: password,
-            decoration: InputDecoration(labelText: "Password"),
-          ),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: _isLoading ? null : _handleLogin,
-                child: _isLoading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Text('Login'),
-              ),
-            ],
-          ),
-        ],
-      )),
-=======
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-
             TextFormField(
               controller: username,
               decoration: InputDecoration(labelText: "Phone"),
@@ -228,26 +120,29 @@ class _MyHomePageState extends State<MyHomePage> {
             TextFormField(
               obscureText: true,
               controller: password,
-              decoration: InputDecoration(
-                labelText: "Password"),
+              decoration: InputDecoration(labelText: "Password"),
             ),
-         
-            
             Row(
               children: [
-          
-            ElevatedButton(
-              onPressed: ()=> AuthService(baseUrl: 'https://limsonvercelapi2.vercel.app').authenticate(username.text,password.text,selectedValue.toString(),context),
-             // onPressed: () => validate(username.text, password.text),
-              child: Text('Login'),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _handleLogin,
+                  child: _isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text('Login'),
+                ),
+              ],
             ),
           ],
-            ),
-             ],
-      )
-         ),
-         
->>>>>>> ef7322ab7c9ac2128c723dc72a1775edbac96ad8
+        ),
+      ),
     );
   }
 }
