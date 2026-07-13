@@ -89,6 +89,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
   final TextEditingController mobileController = TextEditingController();
 
+  final ScrollController _horizontalScrollController = ScrollController();
+
 
 
   TabController? _tabController;
@@ -547,6 +549,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     nameController.dispose();
 
     mobileController.dispose();
+
+    _horizontalScrollController.dispose();
 
     super.dispose();
 
@@ -1030,46 +1034,58 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                     else
 
-                      SingleChildScrollView(
+                      Scrollbar(
 
-                        scrollDirection: Axis.horizontal,
+                        controller: _horizontalScrollController,
 
-                        child: DataTable(
+                        thumbVisibility: true,
 
-                          columns: const [
+                        trackVisibility: true,
 
-                            DataColumn(label: w.Text('Customer')),
+                        child: SingleChildScrollView(
 
-                            DataColumn(label: w.Text('Address')),
-                            DataColumn(label: w.Text('Phone')),
+                          controller: _horizontalScrollController,
 
+                          scrollDirection: Axis.horizontal,
 
-                            DataColumn(label: w.Text('Allotted To')),
+                          child: DataTable(
 
-                            DataColumn(label: w.Text('Status')),
+                            columns: const [
 
-                            DataColumn(label: w.Text('Brand')),
+                              DataColumn(label: w.Text('Customer')),
 
-                            DataColumn(label: w.Text('Category')),
-
-                            DataColumn(label: w.Text('Product')),
-
-                            DataColumn(label: w.Text('Warranty Date')),
-
-                            DataColumn(label: w.Text('Purchase Date')),
-                            DataColumn(label: w.Text('Date of Complaint')),
-
-                            DataColumn(label: w.Text('Visit Date')),
-                            DataColumn(label: w.Text('Solve Date')),
+                              DataColumn(label: w.Text('Address')),
+                              DataColumn(label: w.Text('Phone')),
 
 
-                            DataColumn(label: w.Text('Dealer')),
+                              DataColumn(label: w.Text('Allotted To')),
 
-                            DataColumn(label: w.Text('Location')),
+                              DataColumn(label: w.Text('Status')),
 
-                          ],
+                              DataColumn(label: w.Text('Brand')),
 
-                          rows: notifier.orderedRows.map((rowState) => _buildDataRow(context, rowState)).toList(),
+                              DataColumn(label: w.Text('Category')),
+
+                              DataColumn(label: w.Text('Product')),
+
+                              DataColumn(label: w.Text('Warranty Date')),
+
+                              DataColumn(label: w.Text('Purchase Date')),
+                              DataColumn(label: w.Text('Date of Complaint')),
+
+                              DataColumn(label: w.Text('Visit Date')),
+                              DataColumn(label: w.Text('Solve Date')),
+
+
+                              DataColumn(label: w.Text('Dealer')),
+
+                              DataColumn(label: w.Text('Location')),
+
+                            ],
+
+                            rows: notifier.orderedRows.map((rowState) => _buildDataRow(context, rowState)).toList(),
+
+                          ),
 
                         ),
 

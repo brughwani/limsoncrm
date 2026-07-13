@@ -41,7 +41,7 @@ class AuthService {
       _scheduleTokenRefresh(token);
       return data;
     } else {
-      throw Exception('Failed to authenticate: ${response.body}');
+      throw Exception('Failed to authenticate: ${response.statusCode} - ${response.body}');
     }
   }
 

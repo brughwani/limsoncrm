@@ -19,14 +19,28 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController username = TextEditingController();
   final TextEditingController password = TextEditingController();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     selectedValue = 'Admin';
+    username.addListener(_clearError);
+    password.addListener(_clearError);
   }
+
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
+  }
+
   @override
   void dispose() {
+    username.removeListener(_clearError);
+    password.removeListener(_clearError);
     username.dispose();
     password.dispose();
     super.dispose();
@@ -52,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _isLoading = true;
+      _errorMessage = null;
     });
 
     try {
@@ -69,6 +84,10 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         errorMessage = 'Login failed. Please try again.';
       }
+
+      setState(() {
+        _errorMessage = errorMessage;
+      });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -114,13 +133,19 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             TextFormField(
               controller: username,
-              decoration: InputDecoration(labelText: "Phone"),
+              decoration: InputDecoration(
+                labelText: "Phone",
+                errorText: _errorMessage != null ? '' : null,
+              ),
               keyboardType: TextInputType.phone,
             ),
             TextFormField(
               obscureText: true,
               controller: password,
-              decoration: InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(
+                labelText: "Password",
+                errorText: _errorMessage,
+              ),
             ),
             Row(
               children: [
