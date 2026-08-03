@@ -1416,6 +1416,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
 
+              final complaintNotifier = Provider.of<ComplaintDataNotifier>(context, listen: false);
+
               return CellWidget<String>(
 
                 isDropdown: true,
@@ -1424,7 +1426,9 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                 options: productOptions,
 
-                onChanged: state.updateProduct,
+                onChanged: (newProduct) {
+                  state.updateProduct(newProduct, notifier: complaintNotifier);
+                },
 
               );
 

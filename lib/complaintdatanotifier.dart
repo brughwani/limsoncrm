@@ -11,6 +11,7 @@ class ComplaintDataNotifier extends ChangeNotifier {
   List<RowState> _orderedRows = [];
   List<String> _employees = ['Select an employee', 'Not assigned'];
   List<String> _brands = ['Select a brand'];
+  Map<String, String> _productKarigarMap = {};
   bool _isLoading = false;
   bool _isSaving = false;
   Map<String, Map<String, dynamic>> _pendingUpdates = {};
@@ -23,7 +24,37 @@ class ComplaintDataNotifier extends ChangeNotifier {
   bool get isSaving => _isSaving;
   List<String> get employees => _employees;
   List<String> get brands => _brands;
+  Map<String, String> get productKarigarMap => _productKarigarMap;
   bool get hasPendingUpdates => _pendingUpdates.isNotEmpty;
+
+  String? getKarigarForProduct(String productName) {
+    if (productName.isEmpty || productName == 'Select a product') return null;
+
+    final nameLower = productName.trim().toLowerCase();
+    String? matchedKarigarName;
+
+    // Specific product assignment rules
+    if (nameLower.contains('ceiling fan')) {
+      matchedKarigarName = 'samir';
+    } else if (nameLower.contains('gas stove')) {
+      matchedKarigarName = 'sachin';
+    } else {
+      matchedKarigarName = _productKarigarMap[productName] ??
+          _productKarigarMap[productName.trim()] ??
+          _productKarigarMap[nameLower];
+    }
+
+    if (matchedKarigarName != null && matchedKarigarName.isNotEmpty) {
+      for (final emp in _employees) {
+        if (emp.toLowerCase() == matchedKarigarName.toLowerCase()) {
+          return emp;
+        }
+      }
+      return matchedKarigarName;
+    }
+
+    return null;
+  }
 
   @override
   void notifyListeners() {
@@ -104,6 +135,43 @@ class ComplaintDataNotifier extends ChangeNotifier {
           'Not assigned',
           ...empList.map((e) => e['First name'].toString())
         ];
+
+        _productKarigarMap.clear();
+        for (var emp in empList) {
+          if (emp is Map<String, dynamic>) {
+            String empName = emp['First name']?.toString() ??
+                (emp['fields'] is Map ? emp['fields']['First name']?.toString() : null) ??
+                '';
+            if (empName.isNotEmpty) {
+              var prods = emp['products'] ??
+                  emp['product'] ??
+                  emp['Products'] ??
+                  emp['Product'] ??
+                  emp['specialization'] ??
+                  emp['category'] ??
+                  (emp['fields'] is Map
+                      ? emp['fields']['product'] ?? emp['fields']['products']
+                      : null);
+              if (prods != null) {
+                if (prods is List) {
+                  for (var p in prods) {
+                    if (p != null && p.toString().trim().isNotEmpty) {
+                      _productKarigarMap[p.toString().trim()] = empName;
+                      _productKarigarMap[p.toString().trim().toLowerCase()] = empName;
+                    }
+                  }
+                } else if (prods is String) {
+                  for (var p in prods.split(',')) {
+                    if (p.trim().isNotEmpty) {
+                      _productKarigarMap[p.trim()] = empName;
+                      _productKarigarMap[p.trim().toLowerCase()] = empName;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     } catch (e) {
       _employees = ['Error loading employees'];

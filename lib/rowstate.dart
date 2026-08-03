@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'complaintdatanotifier.dart';
 
 
 
@@ -48,6 +49,7 @@ class RowState extends ChangeNotifier {
   List<String> _fetchedCategories = ['Select Brand'];
   List<String> _fetchedProducts = ['Select Category'];
   List<String> _fetchedEmployees = ['Select Employee'];
+  Map<String, String> _rowProductKarigarMap = {};
   bool _isLoadingCategories = false;
   bool _isLoadingProducts = false;
   bool _isLoadinglocations= false;
@@ -251,10 +253,40 @@ class RowState extends ChangeNotifier {
     await fetchProducts(_brand, newCategory);
   }
 
-  void updateProduct(String newProduct) {
+  void updateProduct(String newProduct, {ComplaintDataNotifier? notifier}) {
     if (_product == newProduct) return;
     _product = newProduct;
     updateNewValuesCallback(id, {'productname': _product});
+
+    // Auto-assign karigar based on selected product
+    String? assignedKarigar;
+    final productLower = newProduct.trim().toLowerCase();
+    if (productLower.contains('ceiling fan')) {
+      assignedKarigar = 'samir';
+    } else if (productLower.contains('gas stove')) {
+      assignedKarigar = 'sachin';
+    } else {
+      assignedKarigar = _rowProductKarigarMap[newProduct] ??
+          _rowProductKarigarMap[newProduct.trim()] ??
+          notifier?.getKarigarForProduct(newProduct);
+    }
+
+    if (assignedKarigar != null && notifier != null) {
+      for (final emp in notifier.employees) {
+        if (emp.toLowerCase() == assignedKarigar.toLowerCase()) {
+          assignedKarigar = emp;
+          break;
+        }
+      }
+    }
+
+    if (assignedKarigar != null &&
+        assignedKarigar.isNotEmpty &&
+        assignedKarigar != 'Select an employee' &&
+        assignedKarigar != 'Not assigned') {
+      updateEmployee(assignedKarigar);
+    }
+
     notifyListeners();
   }
 
@@ -405,7 +437,40 @@ class RowState extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         List<dynamic> decodedList = json.decode(response.body);
-        _fetchedProducts = ['Select a product', ...decodedList.map((item) => item['name'].toString()).toList()];
+        _fetchedProducts = ['Select a product'];
+        _rowProductKarigarMap.clear();
+
+        for (var item in decodedList) {
+          if (item is Map<String, dynamic>) {
+            String name = item['name']?.toString() ??
+                item['Product name']?.toString() ??
+                item['productname']?.toString() ??
+                '';
+            if (name.isNotEmpty) {
+              _fetchedProducts.add(name);
+              String? karigar = item['karigar']?.toString() ??
+                  item['karigarName']?.toString() ??
+                  item['assignedKarigar']?.toString() ??
+                  item['allotted to']?.toString() ??
+                  item['allottedTo']?.toString() ??
+                  item['employee']?.toString() ??
+                  item['defaultKarigar']?.toString() ??
+                  (item['fields'] is Map
+                      ? item['fields']['karigar']?.toString() ??
+                          item['fields']['allotted to']?.toString() ??
+                          item['fields']['Karigar']?.toString()
+                      : null);
+              if (karigar != null && karigar.isNotEmpty) {
+                _rowProductKarigarMap[name] = karigar;
+              }
+            }
+          } else if (item != null) {
+            String strName = item.toString();
+            if (strName.isNotEmpty) {
+              _fetchedProducts.add(strName);
+            }
+          }
+        }
 
         if (initialLoad && _fetchedProducts.contains(_product)) {
           // Keep existing product
