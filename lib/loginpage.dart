@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 
 import 'authservice.dart';
 
+import 'directcomplaintpage.dart';
+
 //import 'package:lmrepaircrmadmin/Admindashboard.dart';
 class MyHomePage extends StatefulWidget {
   @override
@@ -164,6 +166,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       : Text('Login'),
                 ),
               ],
+            ),
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DirectCustomerAuthPage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.assignment_turned_in_outlined),
+              label: const Text('Direct Complaint Registration for Customer'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              ),
             ),
           ],
         ),

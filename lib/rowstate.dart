@@ -46,7 +46,12 @@ class RowState extends ChangeNotifier {
   //   'Content-Type': 'application/json',
   //   'Authorization': 'Bearer $token'
   // };
-  List<String> _fetchedCategories = ['Select Brand'];
+  List<String> _fetchedCategories = [
+    'Select a category',
+    'mini cooler (6" or 9")',
+    'small cooler(12")',
+    'big cooler(16" or 18")',
+  ];
   List<String> _fetchedProducts = ['Select Category'];
   List<String> _fetchedEmployees = ['Select Employee'];
   Map<String, String> _rowProductKarigarMap = {};
@@ -242,15 +247,39 @@ class RowState extends ChangeNotifier {
     await fetchCategories(newBrand);
   }
 
-  void updateCategory(String newCategory) async {
+  void updateCategory(String newCategory, {ComplaintDataNotifier? notifier}) async {
     if (_category == newCategory) return;
     _category = newCategory;
-    _product = 'Select Category';
-    _fetchedProducts = ['Loading...'];
-    updateNewValuesCallback(id, {'productcategory': _category, 'productname': _product});
-    notifyListeners();
+    updateNewValuesCallback(id, {'productcategory': _category, 'Category': _category});
 
-    await fetchProducts(_brand, newCategory);
+    // Auto-assign karigar based on selected category
+    String? assignedKarigar;
+    final catLower = newCategory.trim().toLowerCase();
+    if (catLower.contains('ceiling fan') || catLower.contains('cooler')) {
+      assignedKarigar = 'samir';
+    } else if (catLower.contains('gas stove')) {
+      assignedKarigar = 'sachin';
+    } else {
+      assignedKarigar = notifier?.getKarigarForProduct(newCategory);
+    }
+
+    if (assignedKarigar != null && notifier != null) {
+      for (final emp in notifier.employees) {
+        if (emp.toLowerCase() == assignedKarigar.toLowerCase()) {
+          assignedKarigar = emp;
+          break;
+        }
+      }
+    }
+
+    if (assignedKarigar != null &&
+        assignedKarigar.isNotEmpty &&
+        assignedKarigar != 'Select an employee' &&
+        assignedKarigar != 'Not assigned') {
+      updateEmployee(assignedKarigar);
+    }
+
+    notifyListeners();
   }
 
   void updateProduct(String newProduct, {ComplaintDataNotifier? notifier}) {
@@ -261,7 +290,7 @@ class RowState extends ChangeNotifier {
     // Auto-assign karigar based on selected product
     String? assignedKarigar;
     final productLower = newProduct.trim().toLowerCase();
-    if (productLower.contains('ceiling fan')) {
+    if (productLower.contains('ceiling fan') || productLower.contains('cooler')) {
       assignedKarigar = 'samir';
     } else if (productLower.contains('gas stove')) {
       assignedKarigar = 'sachin';
@@ -390,7 +419,17 @@ class RowState extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> rawCategories = json.decode(response.body);
-        _fetchedCategories = ['Select a category', ...List<String>.from(rawCategories)];
+        final fetched = List<String>.from(rawCategories);
+        for (var item in [
+          'mini cooler (6" or 9")',
+          'small cooler(12")',
+          'big cooler(16" or 18")',
+        ]) {
+          if (!fetched.contains(item)) {
+            fetched.add(item);
+          }
+        }
+        _fetchedCategories = ['Select a category', ...fetched];
 
         if (initialLoad && _fetchedCategories.contains(_category)) {
           // Keep existing category

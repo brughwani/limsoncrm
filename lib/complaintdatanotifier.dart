@@ -33,8 +33,8 @@ class ComplaintDataNotifier extends ChangeNotifier {
     final nameLower = productName.trim().toLowerCase();
     String? matchedKarigarName;
 
-    // Specific product assignment rules
-    if (nameLower.contains('ceiling fan')) {
+    // Specific product/category assignment rules
+    if (nameLower.contains('ceiling fan') || nameLower.contains('cooler')) {
       matchedKarigarName = 'samir';
     } else if (nameLower.contains('gas stove')) {
       matchedKarigarName = 'sachin';
