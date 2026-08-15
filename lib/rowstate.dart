@@ -263,9 +263,10 @@ class RowState extends ChangeNotifier {
       assignedKarigar = notifier?.getKarigarForProduct(newCategory);
     }
 
-    if (assignedKarigar != null && notifier != null) {
+    final String? targetCategoryKarigar = assignedKarigar;
+    if (targetCategoryKarigar != null && notifier != null) {
       for (final emp in notifier.employees) {
-        if (emp.toLowerCase() == assignedKarigar.toLowerCase()) {
+        if (emp.toLowerCase() == targetCategoryKarigar.toLowerCase()) {
           assignedKarigar = emp;
           break;
         }
@@ -300,9 +301,10 @@ class RowState extends ChangeNotifier {
           notifier?.getKarigarForProduct(newProduct);
     }
 
-    if (assignedKarigar != null && notifier != null) {
+    final String? targetProductKarigar = assignedKarigar;
+    if (targetProductKarigar != null && notifier != null) {
       for (final emp in notifier.employees) {
-        if (emp.toLowerCase() == assignedKarigar.toLowerCase()) {
+        if (emp.toLowerCase() == targetProductKarigar.toLowerCase()) {
           assignedKarigar = emp;
           break;
         }

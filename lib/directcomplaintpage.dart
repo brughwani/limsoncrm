@@ -148,7 +148,7 @@ class _DirectCustomerAuthPageState extends State<DirectCustomerAuthPage> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Container(
-            maxWidth: 450,
+            constraints: const BoxConstraints(maxWidth: 450),
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -513,7 +513,7 @@ class _DirectComplaintRegistrationPageState
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Container(
-            maxWidth: 600,
+            constraints: const BoxConstraints(maxWidth: 600),
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
