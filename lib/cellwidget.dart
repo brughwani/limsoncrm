@@ -114,11 +114,21 @@ class _CellWidgetState<T> extends State<CellWidget<T>> {
   @override
   Widget build(BuildContext context) {
     if (widget.isDropdown) {
-      T? displayValue = widget.options?.contains(_dropdownCurrentValue) == true
-          ? _dropdownCurrentValue
-          : (widget.options != null && widget.options!.isNotEmpty
-          ? widget.options!.first
-          : null);
+      T? displayValue;
+      if (widget.options != null && widget.options!.isNotEmpty) {
+        if (widget.options!.contains(_dropdownCurrentValue)) {
+          displayValue = _dropdownCurrentValue;
+        } else if (_dropdownCurrentValue != null) {
+          final currentStr = _dropdownCurrentValue.toString().trim().toLowerCase();
+          final match = widget.options!.cast<dynamic>().firstWhere(
+            (opt) => opt.toString().trim().toLowerCase() == currentStr,
+            orElse: () => null,
+          );
+          displayValue = (match as T?) ?? widget.options!.first;
+        } else {
+          displayValue = widget.options!.first;
+        }
+      }
 
       return DropdownButton<T>(
         value: displayValue,

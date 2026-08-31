@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
-
+import 'complaintdatanotifier.dart';
 
 class RowState extends ChangeNotifier {
   final String id;
@@ -17,7 +16,6 @@ class RowState extends ChangeNotifier {
   final TextEditingController visitDateController;
   final TextEditingController solveDateController;
   final TextEditingController phoneController;
-
 
   // Fields for client-side filtering
   final String complaintDate;
@@ -34,7 +32,6 @@ class RowState extends ChangeNotifier {
   String? solvedate;
   final String address;
 
-
   // Private fields
   String _brand;
   String _category;
@@ -45,12 +42,20 @@ class RowState extends ChangeNotifier {
   //   'Content-Type': 'application/json',
   //   'Authorization': 'Bearer $token'
   // };
-  List<String> _fetchedCategories = ['Select Brand'];
+  List<String> _fetchedCategories = [
+    'Select a category',
+    'Ceiling Fan',
+    'Gas Stove',
+    'small cooler',
+    'medium cooler',
+    'big cooler',
+  ];
   List<String> _fetchedProducts = ['Select Category'];
   List<String> _fetchedEmployees = ['Select Employee'];
+  Map<String, String> _rowProductKarigarMap = {};
   bool _isLoadingCategories = false;
   bool _isLoadingProducts = false;
-  bool _isLoadinglocations= false;
+  bool _isLoadinglocations = false;
   bool _isLoadingDealers = false;
   List<String> fetchedLocations = ['Select a location'];
   List<String> fetchedDealers = ['Select a dealer'];
@@ -64,17 +69,14 @@ class RowState extends ChangeNotifier {
   List<String> get fetchedProducts => _fetchedProducts;
   bool get isLoadingCategories => _isLoadingCategories;
   bool get isLoadingProducts => _isLoadingProducts;
-  Map<String, String> get _headers => {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $token'
-  };
+  Map<String, String> get _headers =>
+      {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
   RowState({
     required this.id,
     required this.token,
     required this.updateNewValuesCallback,
     required this.name,
     required this.address,
-
     required String brand,
     required String category,
     required String product,
@@ -90,9 +92,9 @@ class RowState extends ChangeNotifier {
     required this.dealer,
     required this.serviceType,
     required this.source,
-  }) : nameController = TextEditingController(text: name),
-  addressController=TextEditingController(text: address),
-  phoneController=TextEditingController(text: phoneNumber),
+  })  : nameController = TextEditingController(text: name),
+        addressController = TextEditingController(text: address),
+        phoneController = TextEditingController(text: phoneNumber),
         warrantyDateController = TextEditingController(text: warrantyDate),
         purchaseDateController = TextEditingController(text: purchaseDate),
         visitDateController = TextEditingController(text: visitdate),
@@ -119,11 +121,11 @@ class RowState extends ChangeNotifier {
 
     String complaintDateString = '';
     String visitDate = '';
-    String solveDate='';
+    String solveDate = '';
     final rawDate = fields['date of complain'];
 
-    final rawDate1=fields['Visit date'];
-    final rawDate2=fields['Solve date'];
+    final rawDate1 = fields['Visit date'];
+    final rawDate2 = fields['Solve date'];
 
     if (rawDate1 is String) {
       // Case 1: The date is already a string (e.g., ISO 8601)
@@ -159,9 +161,6 @@ class RowState extends ChangeNotifier {
       solveDate = '';
     }
 
-
-
-
     if (rawDate is String) {
       // Case 1: The date is already a string (e.g., ISO 8601)
       complaintDateString = rawDate;
@@ -177,12 +176,69 @@ class RowState extends ChangeNotifier {
       complaintDateString = DateFormat('dd-MM-yyyy').format(timestamp);
 
       complaintDateString = DateFormat('yyyy-MM-dd').format(timestamp);
-
     } else {
       // Case 3: Handle any other unexpected format gracefully
       complaintDateString = '';
     }
 
+    final rawEmp = fields['allotted to'] ??
+        fields['allottedTo'] ??
+        fields['Allotted To'] ??
+        fields['allotted_to'] ??
+        fields['karigar'] ??
+        fields['Karigar'] ??
+        fields['employee'] ??
+        fields['Employee'];
+    String initialEmployee = rawEmp?.toString().trim() ?? '';
+
+    final catVal = (fields['Category'] ??
+            fields['category'] ??
+            fields['productcategory'] ??
+            fields['Product Category'] ??
+            fields['product_category'] ??
+            '')
+        .toString()
+        .trim()
+        .toLowerCase();
+    final prodVal = (fields['Product name'] ??
+            fields['productname'] ??
+            fields['Product Name'] ??
+            fields['Product'] ??
+            fields['product'] ??
+            fields['item'] ??
+            fields['Item'] ??
+            '')
+        .toString()
+        .trim()
+        .toLowerCase();
+
+    if (initialEmployee.toLowerCase() == 'samir' || initialEmployee.toLowerCase().contains('samir')) {
+      initialEmployee = 'Samir';
+    } else if (initialEmployee.toLowerCase() == 'sachin' || initialEmployee.toLowerCase().contains('sachin')) {
+      initialEmployee = 'Sachin';
+    } else if (initialEmployee.isEmpty ||
+        initialEmployee == 'Not assigned' ||
+        initialEmployee == 'Select an employee') {
+      if (catVal.contains('ceiling fan') ||
+          catVal.contains('cooler') ||
+          catVal.contains('fan') ||
+          prodVal.contains('ceiling fan') ||
+          prodVal.contains('cooler') ||
+          prodVal.contains('fan')) {
+        initialEmployee = 'Samir';
+      } else if (catVal.contains('gas stove') ||
+          catVal.contains('stove') ||
+          catVal.contains('gas') ||
+          catVal.contains('chulha') ||
+          prodVal.contains('gas stove') ||
+          prodVal.contains('stove') ||
+          prodVal.contains('gas') ||
+          prodVal.contains('chulha')) {
+        initialEmployee = 'Sachin';
+      } else {
+        initialEmployee = 'Not assigned';
+      }
+    }
 
     return RowState(
       id: json['id'].toString(),
@@ -191,17 +247,19 @@ class RowState extends ChangeNotifier {
       name: fields['Customer name'] as String? ?? '',
       address: fields['address'],
       brand: fields['Brand'] as String? ?? '',
-      category: fields['Category'] as String? ?? '',
-      product: fields['Product name'] as String? ?? '',
+      category: fields['Category'] as String? ??
+          fields['productcategory'] as String? ??
+          '',
+      product: fields['Product name'] as String? ??
+          fields['productname'] as String? ??
+          '',
       warrantyDate: fields['warranty expiry date'] as String? ?? '',
       purchaseDate: fields['Purchase date'] as String? ?? '',
-      employee: fields['allotted to'] as String? ?? 'Not assigned',
+      employee: initialEmployee,
       status: fields['Status'] as String? ?? 'Open',
-     complaintDate: complaintDateString,
-
+      complaintDate: complaintDateString,
       visitdate: visitDate,
       solvedate: solveDate,
-
       phoneNumber: fields['Phone'] as String? ?? '',
       village: fields['Village'] as String? ?? '',
       dealer: fields['Dealer name'] as String? ?? '',
@@ -209,8 +267,6 @@ class RowState extends ChangeNotifier {
       source: fields['Source by'] as String? ?? '',
     );
   }
-
-
 
   void _initializeDropdowns() async {
     if (_brand.isNotEmpty && _brand != 'Select a brand') {
@@ -234,27 +290,101 @@ class RowState extends ChangeNotifier {
     _product = 'Select Category';
     _fetchedCategories = ['Loading...'];
     _fetchedProducts = ['Select Category'];
-    updateNewValuesCallback(id, {'Brand': _brand, 'productcategory': _category, 'productname': _product});
+    updateNewValuesCallback(id, {
+      'Brand': _brand,
+      'productcategory': _category,
+      'productname': _product
+    });
     notifyListeners();
 
     await fetchCategories(newBrand);
   }
 
-  void updateCategory(String newCategory) async {
+  void updateCategory(String newCategory,
+      {ComplaintDataNotifier? notifier}) async {
     if (_category == newCategory) return;
     _category = newCategory;
-    _product = 'Select Category';
-    _fetchedProducts = ['Loading...'];
-    updateNewValuesCallback(id, {'productcategory': _category, 'productname': _product});
-    notifyListeners();
+    updateNewValuesCallback(
+        id, {'productcategory': _category, 'Category': _category});
 
-    await fetchProducts(_brand, newCategory);
+    // Auto-assign karigar based on selected category
+    String? assignedKarigar;
+    final catLower = newCategory.trim().toLowerCase();
+    if (catLower.contains('ceiling fan') ||
+        catLower.contains('cooler') ||
+        catLower.contains('fan')) {
+      assignedKarigar = 'Samir';
+    } else if (catLower.contains('gas stove') ||
+        catLower.contains('stove') ||
+        catLower.contains('gas') ||
+        catLower.contains('chulha')) {
+      assignedKarigar = 'Sachin';
+    } else {
+      assignedKarigar = notifier?.getKarigarForProduct(newCategory);
+    }
+
+    final String? targetCategoryKarigar = assignedKarigar;
+    if (targetCategoryKarigar != null && notifier != null) {
+      for (final emp in notifier.employees) {
+        if (emp.toLowerCase() == targetCategoryKarigar.toLowerCase() ||
+            emp.toLowerCase().contains(targetCategoryKarigar.toLowerCase())) {
+          assignedKarigar = emp;
+          break;
+        }
+      }
+    }
+
+    if (assignedKarigar != null &&
+        assignedKarigar.isNotEmpty &&
+        assignedKarigar != 'Select an employee' &&
+        assignedKarigar != 'Not assigned') {
+      updateEmployee(assignedKarigar);
+    }
+
+    notifyListeners();
   }
 
-  void updateProduct(String newProduct) {
+  void updateProduct(String newProduct, {ComplaintDataNotifier? notifier}) {
     if (_product == newProduct) return;
     _product = newProduct;
     updateNewValuesCallback(id, {'productname': _product});
+
+    // Auto-assign karigar based on selected product
+    String? assignedKarigar;
+    final productLower = newProduct.trim().toLowerCase();
+    if (productLower.contains('ceiling fan') ||
+        productLower.contains('cooler') ||
+        productLower.contains('fan')) {
+      assignedKarigar = 'Samir';
+    } else if (productLower.contains('gas stove') ||
+        productLower.contains('stove') ||
+        productLower.contains('gas') ||
+        productLower.contains('chulha')) {
+      assignedKarigar = 'Sachin';
+    } else {
+      assignedKarigar = _rowProductKarigarMap[newProduct] ??
+          _rowProductKarigarMap[newProduct.trim()] ??
+          notifier?.getKarigarForProduct(newProduct);
+    }
+
+    final String? targetProductKarigar = assignedKarigar;
+    if (targetProductKarigar != null && notifier != null) {
+      for (final emp in notifier.employees) {
+        if (emp.toLowerCase() == targetProductKarigar.toLowerCase() ||
+            emp.toLowerCase().contains(targetProductKarigar.toLowerCase())) {
+          assignedKarigar = emp;
+          break;
+        }
+      }
+    }
+
+    if (assignedKarigar != null &&
+        assignedKarigar.isNotEmpty &&
+        assignedKarigar != 'Select an employee' &&
+        assignedKarigar != 'Not assigned') {
+      updateEmployee(assignedKarigar);
+    }
+
     notifyListeners();
   }
 
@@ -267,7 +397,8 @@ class RowState extends ChangeNotifier {
 
   void updateStatus(String newStatus) {
     const validOptions = ['Open', 'In Progress', 'Resolved'];
-    final validatedStatus = validOptions.contains(newStatus) ? newStatus : 'Open';
+    final validatedStatus =
+        validOptions.contains(newStatus) ? newStatus : 'Open';
     if (_status == validatedStatus) return;
     _status = validatedStatus;
     updateNewValuesCallback(id, {'Status': _status});
@@ -277,12 +408,15 @@ class RowState extends ChangeNotifier {
   void updateName(String newName) {
     updateNewValuesCallback(id, {'Customer name': newName});
   }
+
   void updatephone(String newphone) {
     updateNewValuesCallback(id, {'Phone': newphone});
   }
+
   void updateaddress(String newaddress) {
     updateNewValuesCallback(id, {'address': newaddress});
   }
+
   void updateWarrantyDate(String newDate) {
     warrantyDateController.text = newDate;
     updateNewValuesCallback(id, {'warranty expiry date': newDate});
@@ -307,13 +441,17 @@ class RowState extends ChangeNotifier {
 
   Future<void> fetchLocations() async {
     final response = await http.get(
-      Uri.parse('https://limsonvercelapi2.vercel.app/api/fsdealerservice?getLocations=true'),
+      Uri.parse(
+          'https://limsonvercelapi2.vercel.app/api/fsdealerservice?getLocations=true'),
       headers: _headers,
     );
 
     if (response.statusCode == 200) {
       final List<dynamic> rawLocations = json.decode(response.body);
-      fetchedLocations = ['Select a location', ...List<String>.from(rawLocations)];
+      fetchedLocations = [
+        'Select a location',
+        ...List<String>.from(rawLocations)
+      ];
       notifyListeners();
     } else {
       fetchedLocations = ['Error Fetching Locations'];
@@ -323,26 +461,32 @@ class RowState extends ChangeNotifier {
 
   Future<void> fetchDealers(String loc) async {
     final response = await http.get(
-      Uri.parse('https://limsonvercelapi2.vercel.app/api/fsdealerservice?locality=$loc'),
+      Uri.parse(
+          'https://limsonvercelapi2.vercel.app/api/fsdealerservice?locality=$loc'),
       headers: _headers,
     );
-    if(dealer.isEmpty || dealer == 'Select a dealer') {
+    if (dealer.isEmpty || dealer == 'Select a dealer') {
       fetchedDealers = ['Select a dealer'];
       notifyListeners();
       return;
     }
     _isLoadingDealers = true;
-    if(!_isLoadingDealers) notifyListeners();
+    if (!_isLoadingDealers) notifyListeners();
 
     if (response.statusCode == 200) {
       final List<dynamic> rawDealers = json.decode(response.body);
-      fetchedDealers = ['Select a dealer', ...List<String>.from(rawDealers.map((item) => item['Dealer name'].toString()))];
+      fetchedDealers = [
+        'Select a dealer',
+        ...List<String>.from(
+            rawDealers.map((item) => item['Dealer name'].toString()))
+      ];
       notifyListeners();
     } else {
       fetchedDealers = ['Error Fetching Dealers'];
       notifyListeners();
     }
   }
+
   Future<void> fetchCategories(String brand, {bool initialLoad = false}) async {
     if (brand.isEmpty || brand == 'Select a brand') return;
 
@@ -350,35 +494,77 @@ class RowState extends ChangeNotifier {
     if (!initialLoad) notifyListeners();
 
     try {
+      final encodedBrand = Uri.encodeComponent(brand);
       final response = await http.get(
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$brand'),
+        Uri.parse(
+            'https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$encodedBrand'),
         headers: _headers,
-
       );
+
+      final defaultCategories = [
+        'Ceiling Fan',
+        'Gas Stove',
+        'Cooler',
+        'mini cooler (6" or 9")',
+        'small cooler(12")',
+        'big cooler(16" or 18")',
+      ];
 
       if (response.statusCode == 200) {
         final List<dynamic> rawCategories = json.decode(response.body);
-        _fetchedCategories = ['Select a category', ...List<String>.from(rawCategories)];
+        final fetched =
+            List<String>.from(rawCategories.map((e) => e.toString()));
+        for (var item in defaultCategories) {
+          if (!fetched.any((c) => c.toLowerCase() == item.toLowerCase())) {
+            fetched.add(item);
+          }
+        }
+        _fetchedCategories = ['Select a category', ...fetched];
 
         if (initialLoad && _fetchedCategories.contains(_category)) {
           // Keep existing category
         } else {
-          _category = _fetchedCategories.isNotEmpty ? _fetchedCategories.first : 'Select a category';
+          _category = _fetchedCategories.isNotEmpty
+              ? _fetchedCategories.first
+              : 'Select a category';
         }
 
         await fetchProducts(brand, _category, initialLoad: initialLoad);
       } else {
-        _fetchedCategories = ['Error Fetching Categories'];
-        _category = 'Error Fetching Categories';
+        _fetchedCategories = ['Select a category', ...defaultCategories];
+        if (!initialLoad &&
+            (_category.isEmpty ||
+                _category == 'Select Brand' ||
+                _category == 'Loading...')) {
+          _category = _fetchedCategories.isNotEmpty
+              ? _fetchedCategories.first
+              : 'Select a category';
+        }
       }
     } catch (e) {
-      _fetchedCategories = ['Error: $e'];
-      _category = 'Error: $e';
+      _fetchedCategories = [
+        'Select a category',
+        'Ceiling Fan',
+        'Gas Stove',
+        'Cooler',
+        'mini cooler (6" or 9")',
+        'small cooler(12")',
+        'big cooler(16" or 18")',
+      ];
+      if (!initialLoad &&
+          (_category.isEmpty ||
+              _category == 'Select Brand' ||
+              _category == 'Loading...')) {
+        _category = _fetchedCategories.isNotEmpty
+            ? _fetchedCategories.first
+            : 'Select a category';
+      }
     } finally {
       _isLoadingCategories = false;
       notifyListeners();
     }
   }
+
   void updateVillage(String newVillage) {
     if (village == newVillage) return;
     updateNewValuesCallback(id, {'Location': newVillage});
@@ -391,26 +577,66 @@ class RowState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchProducts(String brand, String category, {bool initialLoad = false}) async {
-    if (brand.isEmpty || category.isEmpty || category == 'Select a category') return;
+  Future<void> fetchProducts(String brand, String category,
+      {bool initialLoad = false}) async {
+    if (brand.isEmpty || category.isEmpty || category == 'Select a category')
+      return;
 
     _isLoadingProducts = true;
     if (!initialLoad) notifyListeners();
 
     try {
+      final encodedBrand = Uri.encodeComponent(brand);
+      final encodedCategory = Uri.encodeComponent(category);
       final response = await http.get(
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$brand&category=$category'),
+        Uri.parse(
+            'https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$encodedBrand&category=$encodedCategory'),
         headers: _headers,
       );
 
       if (response.statusCode == 200) {
         List<dynamic> decodedList = json.decode(response.body);
-        _fetchedProducts = ['Select a product', ...decodedList.map((item) => item['name'].toString()).toList()];
+        _fetchedProducts = ['Select a product'];
+        _rowProductKarigarMap.clear();
+
+        for (var item in decodedList) {
+          if (item is Map<String, dynamic>) {
+            String name = item['name']?.toString() ??
+                item['Product name']?.toString() ??
+                item['productname']?.toString() ??
+                '';
+            if (name.isNotEmpty) {
+              _fetchedProducts.add(name);
+              String? karigar = item['karigar']?.toString() ??
+                  item['karigarName']?.toString() ??
+                  item['assignedKarigar']?.toString() ??
+                  item['allotted to']?.toString() ??
+                  item['allottedTo']?.toString() ??
+                  item['employee']?.toString() ??
+                  item['defaultKarigar']?.toString() ??
+                  (item['fields'] is Map
+                      ? item['fields']['karigar']?.toString() ??
+                          item['fields']['allotted to']?.toString() ??
+                          item['fields']['Karigar']?.toString()
+                      : null);
+              if (karigar != null && karigar.isNotEmpty) {
+                _rowProductKarigarMap[name] = karigar;
+              }
+            }
+          } else if (item != null) {
+            String strName = item.toString();
+            if (strName.isNotEmpty) {
+              _fetchedProducts.add(strName);
+            }
+          }
+        }
 
         if (initialLoad && _fetchedProducts.contains(_product)) {
           // Keep existing product
         } else {
-          _product = _fetchedProducts.isNotEmpty ? _fetchedProducts.first : 'Select a product';
+          _product = _fetchedProducts.isNotEmpty
+              ? _fetchedProducts.first
+              : 'Select a product';
         }
       } else {
         _fetchedProducts = ['Error Fetching Products'];
@@ -429,10 +655,9 @@ class RowState extends ChangeNotifier {
     if (updates.containsKey('Customer name')) {
       nameController.text = updates['Customer name'];
     }
-    if(updates.containsKey('Phone'))
-      {
-        phoneController.text=updates['Phone Number'];
-      }
+    if (updates.containsKey('Phone')) {
+      phoneController.text = updates['Phone Number'];
+    }
     if (updates.containsKey('allotted to')) {
       _employee = updates['allotted to'];
     }
@@ -455,17 +680,14 @@ class RowState extends ChangeNotifier {
       purchaseDateController.text = updates['Purchase date'];
     }
 
-    if(updates.containsKey('Location')) {
+    if (updates.containsKey('Location')) {
       fetchedLocations = ['Select a location', updates['Location']];
     }
 
-    if(updates.containsKey('Dealer')) {
+    if (updates.containsKey('Dealer')) {
       fetchedDealers = ['Select a dealer', updates['Dealer']];
     }
-
   }
-
-
 
   @override
   void dispose() {

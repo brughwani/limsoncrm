@@ -34,10 +34,16 @@ class EmployeeProvider with ChangeNotifier {
     notifyListeners(); // Notify listeners (UI) to rebuild
   }
 
-  Future<List<Map<String, dynamic>>> fetchEmployees(List<String> fields) async {
-    final url = "https://limsonvercelapi2.vercel.app/api/fsemployeeservice?fields=${fields}";
+  Future<List<Map<String, dynamic>>> fetchEmployees(String token,List<String> fields) async {
+    final fieldsString = fields.join(',');
+
+    final url = "https://limsonvercelapi2.vercel.app/api/fsemployeeservice";
     final response = await http.get(
-        Uri.parse(url), headers: {'Content-Type': 'application/json'});
+        Uri.parse(url).replace(queryParameters: {
+          'fields': fieldsString,
+        }), headers: {
+          'Authorization':'Bearer ${token}',
+          'Content-Type': 'application/json'});
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = jsonDecode(response.body);

@@ -8,7 +8,6 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'merged1.dart';
 class AuthService {
   final String baseUrl;
-
   AuthService({required this.baseUrl});
 
   Future<Map<String, dynamic>> authenticate(String phone, String password, String app, BuildContext context) async {
@@ -42,7 +41,7 @@ class AuthService {
       _scheduleTokenRefresh(token);
       return data;
     } else {
-      throw Exception('Failed to authenticate: ${response.body}');
+      throw Exception('Failed to authenticate: ${response.statusCode} - ${response.body}');
     }
   }
 

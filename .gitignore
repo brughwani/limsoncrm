@@ -16,6 +16,7 @@ ios/Runner/GoogleService-Info.plist
 *.comments
 # IntelliJ related
 *.iml
+
 *.ipr
 *.iws
 .idea/

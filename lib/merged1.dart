@@ -74,7 +74,15 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
   List<String> dealerNamesForUI = ['Select a dealer'];
 
-  List<String> categoriesForUI = ['Select a category'];
+  List<String> categoriesForUI = [
+    'Select a category',
+    'Ceiling Fan',
+    'Gas Stove',
+    'Cooler',
+    'mini cooler (6" or 9")',
+    'small cooler(12")',
+    'big cooler(16" or 18")',
+  ];
 
   List<String> brandsForUI = ['Select a brand'];
 
@@ -88,6 +96,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
   final TextEditingController nameController = TextEditingController();
 
   final TextEditingController mobileController = TextEditingController();
+
+  final ScrollController _horizontalScrollController = ScrollController();
 
 
 
@@ -255,34 +265,46 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
 
+    final defaultCategories = [
+      'Ceiling Fan',
+      'Gas Stove',
+      'Cooler',
+      'mini cooler (6" or 9")',
+      'small cooler(12")',
+      'big cooler(16" or 18")',
+    ];
+
     try {
-
+      final encodedBrand = Uri.encodeComponent(Brand);
       final response = await http.get(
-
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$Brand'),
-
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$encodedBrand'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${widget.token}'},
-
       );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> categoryList = jsonDecode(response.body);
+        final fetched = categoryList.map((category) => category.toString()).toList();
+
+        for (var item in defaultCategories) {
+          if (!fetched.any((c) => c.toLowerCase() == item.toLowerCase())) {
+            fetched.add(item);
+          }
+        }
 
         setState(() {
-
-          categoriesForUI = ['Select a category', ...categoryList.map((category) => category.toString())];
-
+          categoriesForUI = ['Select a category', ...fetched];
         });
-
+      } else {
+        setState(() {
+          categoriesForUI = ['Select a category', ...defaultCategories];
+        });
       }
-
     } catch (e) {
-
       print("Error fetching categories: $e");
-
+      setState(() {
+        categoriesForUI = ['Select a category', ...defaultCategories];
+      });
     }
-
   }
 
 
@@ -306,33 +328,22 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
     try {
-
+      final encodedBrand = Uri.encodeComponent(Brand);
+      final encodedCategory = Uri.encodeComponent(categoryId);
       final response = await http.get(
-
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$Brand&category=$categoryId'),
-
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$encodedBrand&category=$encodedCategory'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${widget.token}'},
-
       );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> productList = json.decode(response.body);
-
         setState(() {
-
-          productsForUI = ['Select a product', ...productList.map((e) => e['name'].toString())];
-
+          productsForUI = ['Select a product', ...productList.map((e) => (e is Map ? (e['name'] ?? e['Product name'] ?? e.toString()) : e.toString()).toString())];
         });
-
       }
-
     } catch (e) {
-
       print("Error fetching products: $e");
-
     }
-
   }
 
 
@@ -440,7 +451,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
       // 2. Define and add the header row
       final headers = [
         'Customer', 'Phone Number', 'Allotted To', 'Status', 'Brand', 'Category',
-        'Product', 'Warranty Date', 'Purchase Date', 'Date of Complaint', 'Dealer', 'Location'
+        'Warranty Date', 'Purchase Date', 'Date of Complaint', 'Dealer', 'Location'
       ];
       sheet.insertRowIterables(headers.map((h) => TextCellValue(h)).toList(), 0);
 
@@ -449,7 +460,7 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
         final row = data[i];
         final rowData = [
           row.name, row.phoneNumber, row.employee, row.status, row.brand,
-          row.category, row.product, row.warrantyDate, row.purchaseDate,
+          row.category, row.warrantyDate, row.purchaseDate,
           row.complaintDate, row.dealer, row.village
         ];
         // Convert all data to TextCellValue to prevent formatting issues
@@ -547,6 +558,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
     nameController.dispose();
 
     mobileController.dispose();
+
+    _horizontalScrollController.dispose();
 
     super.dispose();
 
@@ -879,33 +892,9 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                             selectedCategory = value;
 
-                            productsForUI = ['Select a product'];
-
-                            selectedProduct = null;
-
-                            if (brandselected != null && value != null && value != 'Select a category') {
-
-                              fetchProductsForCategoryForUI(brandselected!, value);
-
-                            }
-
                           });
 
                         }
-
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    _buildDropdown(
-
-                      value: selectedProduct,
-
-                      items: productsForUI,
-
-                      hint: 'Select a product',
-
-                      onChanged: (value) => setState(() => selectedProduct = value),
 
                     ),
 
@@ -998,8 +987,6 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                               category: selectedCategory == 'Select a category' ? null : selectedCategory,
 
-                              product: selectedProduct == 'Select a product' ? null : selectedProduct,
-
                               allottedTo: selectedEmployee,
 
                               servicetype: requesttype,
@@ -1030,46 +1017,56 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
                     else
 
-                      SingleChildScrollView(
+                      Scrollbar(
 
-                        scrollDirection: Axis.horizontal,
+                        controller: _horizontalScrollController,
 
-                        child: DataTable(
+                        thumbVisibility: true,
 
-                          columns: const [
+                        trackVisibility: true,
 
-                            DataColumn(label: w.Text('Customer')),
+                        child: SingleChildScrollView(
 
-                            DataColumn(label: w.Text('Address')),
-                            DataColumn(label: w.Text('Phone')),
+                          controller: _horizontalScrollController,
 
+                          scrollDirection: Axis.horizontal,
 
-                            DataColumn(label: w.Text('Allotted To')),
+                          child: DataTable(
 
-                            DataColumn(label: w.Text('Status')),
+                            columns: const [
 
-                            DataColumn(label: w.Text('Brand')),
+                              DataColumn(label: w.Text('Customer')),
 
-                            DataColumn(label: w.Text('Category')),
-
-                            DataColumn(label: w.Text('Product')),
-
-                            DataColumn(label: w.Text('Warranty Date')),
-
-                            DataColumn(label: w.Text('Purchase Date')),
-                            DataColumn(label: w.Text('Date of Complaint')),
-
-                            DataColumn(label: w.Text('Visit Date')),
-                            DataColumn(label: w.Text('Solve Date')),
+                              DataColumn(label: w.Text('Address')),
+                              DataColumn(label: w.Text('Phone')),
 
 
-                            DataColumn(label: w.Text('Dealer')),
+                              DataColumn(label: w.Text('Allotted To')),
 
-                            DataColumn(label: w.Text('Location')),
+                              DataColumn(label: w.Text('Status')),
 
-                          ],
+                              DataColumn(label: w.Text('Brand')),
 
-                          rows: notifier.orderedRows.map((rowState) => _buildDataRow(context, rowState)).toList(),
+                              DataColumn(label: w.Text('Category')),
+
+                              DataColumn(label: w.Text('Warranty Date')),
+
+                              DataColumn(label: w.Text('Purchase Date')),
+                              DataColumn(label: w.Text('Date of Complaint')),
+
+                              DataColumn(label: w.Text('Visit Date')),
+                              DataColumn(label: w.Text('Solve Date')),
+
+
+                              DataColumn(label: w.Text('Dealer')),
+
+                              DataColumn(label: w.Text('Location')),
+
+                            ],
+
+                            rows: notifier.orderedRows.map((rowState) => _buildDataRow(context, rowState)).toList(),
+
+                          ),
 
                         ),
 
@@ -1348,6 +1345,8 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
 
+            final complaintNotifier = Provider.of<ComplaintDataNotifier>(context, listen: false);
+
             return CellWidget<String>(
 
               isDropdown: true,
@@ -1356,7 +1355,9 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
               options: categoryOptions,
 
-              onChanged: state.updateCategory,
+              onChanged: (newCategory) {
+                state.updateCategory(newCategory, notifier: complaintNotifier);
+              },
 
             );
 
@@ -1365,60 +1366,6 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
         ),
 
       )),
-
-
-
-      DataCell(
-
-        ChangeNotifierProvider.value(
-
-          value: state,
-
-          child: Consumer<RowState>(
-
-            builder: (context, state, _) {
-
-              if (state.isLoadingProducts) {
-
-                return const Center(child: SizedBox(
-
-                  width: 15, height: 15,
-
-                  child: CircularProgressIndicator(strokeWidth: 2),
-
-                ));
-
-              }
-
-              final productOptions = List<String>.from(state.fetchedProducts);
-
-              if (!productOptions.contains(state.product)) {
-
-                productOptions.add(state.product);
-
-              }
-
-
-
-              return CellWidget<String>(
-
-                isDropdown: true,
-
-                value: state.product,
-
-                options: productOptions,
-
-                onChanged: state.updateProduct,
-
-              );
-
-            },
-
-          ),
-
-        ),
-
-      ),
 
 
 
