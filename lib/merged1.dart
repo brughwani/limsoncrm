@@ -76,6 +76,9 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
   List<String> categoriesForUI = [
     'Select a category',
+    'Ceiling Fan',
+    'Gas Stove',
+    'Cooler',
     'mini cooler (6" or 9")',
     'small cooler(12")',
     'big cooler(16" or 18")',
@@ -262,46 +265,46 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
 
+    final defaultCategories = [
+      'Ceiling Fan',
+      'Gas Stove',
+      'Cooler',
+      'mini cooler (6" or 9")',
+      'small cooler(12")',
+      'big cooler(16" or 18")',
+    ];
+
     try {
-
+      final encodedBrand = Uri.encodeComponent(Brand);
       final response = await http.get(
-
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$Brand'),
-
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$encodedBrand'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${widget.token}'},
-
       );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> categoryList = jsonDecode(response.body);
-
         final fetched = categoryList.map((category) => category.toString()).toList();
 
-        for (var item in [
-          'mini cooler (6" or 9")',
-          'small cooler(12")',
-          'big cooler(16" or 18")',
-        ]) {
-          if (!fetched.contains(item)) {
+        for (var item in defaultCategories) {
+          if (!fetched.any((c) => c.toLowerCase() == item.toLowerCase())) {
             fetched.add(item);
           }
         }
 
         setState(() {
-
           categoriesForUI = ['Select a category', ...fetched];
-
         });
-
+      } else {
+        setState(() {
+          categoriesForUI = ['Select a category', ...defaultCategories];
+        });
       }
-
     } catch (e) {
-
       print("Error fetching categories: $e");
-
+      setState(() {
+        categoriesForUI = ['Select a category', ...defaultCategories];
+      });
     }
-
   }
 
 
@@ -325,33 +328,22 @@ class _CRMDashboardState extends State<CRMDashboard> with SingleTickerProviderSt
 
 
     try {
-
+      final encodedBrand = Uri.encodeComponent(Brand);
+      final encodedCategory = Uri.encodeComponent(categoryId);
       final response = await http.get(
-
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$Brand&category=$categoryId'),
-
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$encodedBrand&category=$encodedCategory'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${widget.token}'},
-
       );
 
       if (response.statusCode == 200) {
-
         final List<dynamic> productList = json.decode(response.body);
-
         setState(() {
-
-          productsForUI = ['Select a product', ...productList.map((e) => e['name'].toString())];
-
+          productsForUI = ['Select a product', ...productList.map((e) => (e is Map ? (e['name'] ?? e['Product name'] ?? e.toString()) : e.toString()).toString())];
         });
-
       }
-
     } catch (e) {
-
       print("Error fetching products: $e");
-
     }
-
   }
 
 

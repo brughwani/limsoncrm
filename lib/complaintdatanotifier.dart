@@ -28,15 +28,26 @@ class ComplaintDataNotifier extends ChangeNotifier {
   bool get hasPendingUpdates => _pendingUpdates.isNotEmpty;
 
   String? getKarigarForProduct(String productName) {
-    if (productName.isEmpty || productName == 'Select a product') return null;
+    if (productName.isEmpty ||
+        productName == 'Select a product' ||
+        productName == 'Select a category' ||
+        productName == 'Select Category' ||
+        productName == 'Select Brand') return null;
 
     final nameLower = productName.trim().toLowerCase();
     String? matchedKarigarName;
 
-    // Specific product/category assignment rules
-    if (nameLower.contains('ceiling fan') || nameLower.contains('cooler')) {
+    // Specific product/category assignment rules:
+    // Ceiling Fan / Cooler -> Samir
+    // Gas Stove -> Sachin
+    if (nameLower.contains('ceiling fan') ||
+        nameLower.contains('cooler') ||
+        nameLower.contains('fan')) {
       matchedKarigarName = 'samir';
-    } else if (nameLower.contains('gas stove')) {
+    } else if (nameLower.contains('gas stove') ||
+        nameLower.contains('stove') ||
+        nameLower.contains('chulha') ||
+        nameLower.contains('gas')) {
       matchedKarigarName = 'sachin';
     } else {
       matchedKarigarName = _productKarigarMap[productName] ??
@@ -46,11 +57,12 @@ class ComplaintDataNotifier extends ChangeNotifier {
 
     if (matchedKarigarName != null && matchedKarigarName.isNotEmpty) {
       for (final emp in _employees) {
-        if (emp.toLowerCase() == matchedKarigarName.toLowerCase()) {
+        if (emp.toLowerCase() == matchedKarigarName.toLowerCase() ||
+            emp.toLowerCase().contains(matchedKarigarName.toLowerCase())) {
           return emp;
         }
       }
-      return matchedKarigarName;
+      return matchedKarigarName[0].toUpperCase() + matchedKarigarName.substring(1);
     }
 
     return null;

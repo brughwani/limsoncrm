@@ -48,6 +48,9 @@ class RowState extends ChangeNotifier {
   // };
   List<String> _fetchedCategories = [
     'Select a category',
+    'Ceiling Fan',
+    'Gas Stove',
+    'Cooler',
     'mini cooler (6" or 9")',
     'small cooler(12")',
     'big cooler(16" or 18")',
@@ -191,6 +194,22 @@ class RowState extends ChangeNotifier {
     }
 
 
+    String initialEmployee = fields['allotted to'] as String? ?? '';
+    final catVal = (fields['Category'] as String? ?? fields['productcategory'] as String? ?? '').trim().toLowerCase();
+    final prodVal = (fields['Product name'] as String? ?? fields['productname'] as String? ?? '').trim().toLowerCase();
+
+    if (initialEmployee.isEmpty || initialEmployee == 'Not assigned' || initialEmployee == 'Select an employee') {
+      if (catVal.contains('ceiling fan') || catVal.contains('cooler') || catVal.contains('fan') ||
+          prodVal.contains('ceiling fan') || prodVal.contains('cooler') || prodVal.contains('fan')) {
+        initialEmployee = 'Samir';
+      } else if (catVal.contains('gas stove') || catVal.contains('stove') || catVal.contains('gas') || catVal.contains('chulha') ||
+                 prodVal.contains('gas stove') || prodVal.contains('stove') || prodVal.contains('gas') || prodVal.contains('chulha')) {
+        initialEmployee = 'Sachin';
+      } else {
+        initialEmployee = 'Not assigned';
+      }
+    }
+
     return RowState(
       id: json['id'].toString(),
       token: token,
@@ -198,11 +217,11 @@ class RowState extends ChangeNotifier {
       name: fields['Customer name'] as String? ?? '',
       address: fields['address'],
       brand: fields['Brand'] as String? ?? '',
-      category: fields['Category'] as String? ?? '',
-      product: fields['Product name'] as String? ?? '',
+      category: fields['Category'] as String? ?? fields['productcategory'] as String? ?? '',
+      product: fields['Product name'] as String? ?? fields['productname'] as String? ?? '',
       warrantyDate: fields['warranty expiry date'] as String? ?? '',
       purchaseDate: fields['Purchase date'] as String? ?? '',
-      employee: fields['allotted to'] as String? ?? 'Not assigned',
+      employee: initialEmployee,
       status: fields['Status'] as String? ?? 'Open',
      complaintDate: complaintDateString,
 
@@ -255,10 +274,10 @@ class RowState extends ChangeNotifier {
     // Auto-assign karigar based on selected category
     String? assignedKarigar;
     final catLower = newCategory.trim().toLowerCase();
-    if (catLower.contains('ceiling fan') || catLower.contains('cooler')) {
-      assignedKarigar = 'samir';
-    } else if (catLower.contains('gas stove')) {
-      assignedKarigar = 'sachin';
+    if (catLower.contains('ceiling fan') || catLower.contains('cooler') || catLower.contains('fan')) {
+      assignedKarigar = 'Samir';
+    } else if (catLower.contains('gas stove') || catLower.contains('stove') || catLower.contains('gas') || catLower.contains('chulha')) {
+      assignedKarigar = 'Sachin';
     } else {
       assignedKarigar = notifier?.getKarigarForProduct(newCategory);
     }
@@ -266,7 +285,8 @@ class RowState extends ChangeNotifier {
     final String? targetCategoryKarigar = assignedKarigar;
     if (targetCategoryKarigar != null && notifier != null) {
       for (final emp in notifier.employees) {
-        if (emp.toLowerCase() == targetCategoryKarigar.toLowerCase()) {
+        if (emp.toLowerCase() == targetCategoryKarigar.toLowerCase() ||
+            emp.toLowerCase().contains(targetCategoryKarigar.toLowerCase())) {
           assignedKarigar = emp;
           break;
         }
@@ -291,10 +311,10 @@ class RowState extends ChangeNotifier {
     // Auto-assign karigar based on selected product
     String? assignedKarigar;
     final productLower = newProduct.trim().toLowerCase();
-    if (productLower.contains('ceiling fan') || productLower.contains('cooler')) {
-      assignedKarigar = 'samir';
-    } else if (productLower.contains('gas stove')) {
-      assignedKarigar = 'sachin';
+    if (productLower.contains('ceiling fan') || productLower.contains('cooler') || productLower.contains('fan')) {
+      assignedKarigar = 'Samir';
+    } else if (productLower.contains('gas stove') || productLower.contains('stove') || productLower.contains('gas') || productLower.contains('chulha')) {
+      assignedKarigar = 'Sachin';
     } else {
       assignedKarigar = _rowProductKarigarMap[newProduct] ??
           _rowProductKarigarMap[newProduct.trim()] ??
@@ -304,7 +324,8 @@ class RowState extends ChangeNotifier {
     final String? targetProductKarigar = assignedKarigar;
     if (targetProductKarigar != null && notifier != null) {
       for (final emp in notifier.employees) {
-        if (emp.toLowerCase() == targetProductKarigar.toLowerCase()) {
+        if (emp.toLowerCase() == targetProductKarigar.toLowerCase() ||
+            emp.toLowerCase().contains(targetProductKarigar.toLowerCase())) {
           assignedKarigar = emp;
           break;
         }
@@ -413,21 +434,27 @@ class RowState extends ChangeNotifier {
     if (!initialLoad) notifyListeners();
 
     try {
+      final encodedBrand = Uri.encodeComponent(brand);
       final response = await http.get(
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$brand'),
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=categories&brand=$encodedBrand'),
         headers: _headers,
 
       );
 
+      final defaultCategories = [
+        'Ceiling Fan',
+        'Gas Stove',
+        'Cooler',
+        'mini cooler (6" or 9")',
+        'small cooler(12")',
+        'big cooler(16" or 18")',
+      ];
+
       if (response.statusCode == 200) {
         final List<dynamic> rawCategories = json.decode(response.body);
-        final fetched = List<String>.from(rawCategories);
-        for (var item in [
-          'mini cooler (6" or 9")',
-          'small cooler(12")',
-          'big cooler(16" or 18")',
-        ]) {
-          if (!fetched.contains(item)) {
+        final fetched = List<String>.from(rawCategories.map((e) => e.toString()));
+        for (var item in defaultCategories) {
+          if (!fetched.any((c) => c.toLowerCase() == item.toLowerCase())) {
             fetched.add(item);
           }
         }
@@ -441,12 +468,18 @@ class RowState extends ChangeNotifier {
 
         await fetchProducts(brand, _category, initialLoad: initialLoad);
       } else {
-        _fetchedCategories = ['Error Fetching Categories'];
-        _category = 'Error Fetching Categories';
+        _fetchedCategories = ['Select a category', ...defaultCategories];
       }
     } catch (e) {
-      _fetchedCategories = ['Error: $e'];
-      _category = 'Error: $e';
+      _fetchedCategories = [
+        'Select a category',
+        'Ceiling Fan',
+        'Gas Stove',
+        'Cooler',
+        'mini cooler (6" or 9")',
+        'small cooler(12")',
+        'big cooler(16" or 18")',
+      ];
     } finally {
       _isLoadingCategories = false;
       notifyListeners();
@@ -471,8 +504,10 @@ class RowState extends ChangeNotifier {
     if (!initialLoad) notifyListeners();
 
     try {
+      final encodedBrand = Uri.encodeComponent(brand);
+      final encodedCategory = Uri.encodeComponent(category);
       final response = await http.get(
-        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$brand&category=$category'),
+        Uri.parse('https://limsonvercelapi2.vercel.app/api/fsproductservice?level=products&brand=$encodedBrand&category=$encodedCategory'),
         headers: _headers,
       );
 

@@ -304,6 +304,7 @@ class _DirectComplaintRegistrationPageState
     'Select a category',
     'Ceiling Fan',
     'Gas Stove',
+    'Cooler',
     'mini cooler (6" or 9")',
     'small cooler(12")',
     'big cooler(16" or 18")',
@@ -351,11 +352,11 @@ class _DirectComplaintRegistrationPageState
   }
 
   String _getAutoAssignedKarigar(String? category) {
-    if (category == null) return 'Not assigned';
+    if (category == null || category.isEmpty || category == 'Select a category') return 'Not assigned';
     final catLower = category.trim().toLowerCase();
-    if (catLower.contains('ceiling fan') || catLower.contains('cooler')) {
+    if (catLower.contains('ceiling fan') || catLower.contains('cooler') || catLower.contains('fan')) {
       return 'Samir';
-    } else if (catLower.contains('gas stove')) {
+    } else if (catLower.contains('gas stove') || catLower.contains('stove') || catLower.contains('gas') || catLower.contains('chulha')) {
       return 'Sachin';
     }
     return 'Not assigned';
