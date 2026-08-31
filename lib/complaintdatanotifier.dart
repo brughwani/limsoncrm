@@ -293,20 +293,24 @@ class ComplaintDataNotifier extends ChangeNotifier {
         : null;
 
     _orderedRows = _allComplaints.where((complaint) {
-
-      final complaintDateParsed = (complaint.complaintDate.isNotEmpty)
-          ? DateFormat('dd-MM-yyyy').parse(complaint.complaintDate)
-          : null;
-
-      // If the complaint date is invalid, it fails the date filter.
-      if (complaintDateParsed == null) {
-        return false;
-      }
-
-      // Now we call the new, clean helper function with the DateTime objects.
-      if (!_passesDateFilter(
-          complaintDateParsed, fromDateParsed, toDateParsed)) {
-        return false;
+      // 1. Date filter (only apply if fromdate or todate is specified)
+      if (fromDateParsed != null || toDateParsed != null) {
+        DateTime? complaintDateParsed;
+        if (complaint.complaintDate.isNotEmpty) {
+          try {
+            complaintDateParsed = DateFormat('yyyy-MM-dd').parse(complaint.complaintDate);
+          } catch (_) {
+            try {
+              complaintDateParsed = DateFormat('dd-MM-yyyy').parse(complaint.complaintDate);
+            } catch (_) {
+              complaintDateParsed = DateTime.tryParse(complaint.complaintDate);
+            }
+          }
+        }
+        if (complaintDateParsed == null) return false;
+        if (!_passesDateFilter(complaintDateParsed, fromDateParsed, toDateParsed)) {
+          return false;
+        }
       }
 
       // 2. Text Field Filters - Case insensitive with null safety
@@ -461,11 +465,16 @@ class ComplaintDataNotifier extends ChangeNotifier {
       return true;
     }
 
-    if (filter == 'Not assigned') {
-      return employee.isEmpty || employee == 'Not assigned';
+    final empLower = employee.trim().toLowerCase();
+    final filterLower = filter.trim().toLowerCase();
+
+    if (filterLower == 'not assigned') {
+      return empLower.isEmpty || empLower == 'not assigned';
     }
 
-    return employee.toLowerCase() == filter.toLowerCase();
+    return empLower == filterLower ||
+        empLower.contains(filterLower) ||
+        filterLower.contains(empLower);
   }
 
   void updateNewValues(String recordId, Map<String, dynamic> values) {

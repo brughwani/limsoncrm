@@ -181,19 +181,42 @@ class RowState extends ChangeNotifier {
       complaintDateString = '';
     }
 
-    String initialEmployee = fields['allotted to'] as String? ?? '';
-    final catVal = (fields['Category'] as String? ??
-            fields['productcategory'] as String? ??
+    final rawEmp = fields['allotted to'] ??
+        fields['allottedTo'] ??
+        fields['Allotted To'] ??
+        fields['allotted_to'] ??
+        fields['karigar'] ??
+        fields['Karigar'] ??
+        fields['employee'] ??
+        fields['Employee'];
+    String initialEmployee = rawEmp?.toString().trim() ?? '';
+
+    final catVal = (fields['Category'] ??
+            fields['category'] ??
+            fields['productcategory'] ??
+            fields['Product Category'] ??
+            fields['product_category'] ??
             '')
+        .toString()
         .trim()
         .toLowerCase();
-    final prodVal = (fields['Product name'] as String? ??
-            fields['productname'] as String? ??
+    final prodVal = (fields['Product name'] ??
+            fields['productname'] ??
+            fields['Product Name'] ??
+            fields['Product'] ??
+            fields['product'] ??
+            fields['item'] ??
+            fields['Item'] ??
             '')
+        .toString()
         .trim()
         .toLowerCase();
 
-    if (initialEmployee.isEmpty ||
+    if (initialEmployee.toLowerCase() == 'samir' || initialEmployee.toLowerCase().contains('samir')) {
+      initialEmployee = 'Samir';
+    } else if (initialEmployee.toLowerCase() == 'sachin' || initialEmployee.toLowerCase().contains('sachin')) {
+      initialEmployee = 'Sachin';
+    } else if (initialEmployee.isEmpty ||
         initialEmployee == 'Not assigned' ||
         initialEmployee == 'Select an employee') {
       if (catVal.contains('ceiling fan') ||
